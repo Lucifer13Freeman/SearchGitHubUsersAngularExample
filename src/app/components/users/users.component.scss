@@ -1,0 +1,36 @@
+
+.container
+{
+    display: flex;
+    // justify-content: flex-start;
+
+    &__users
+    {
+        display: flex;
+        // justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+.user {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    max-width: 100px;
+    align-items: center;
+    margin: 1rem;
+    
+    &__avatar {
+
+        img {
+            max-width: 80px;
+            max-height: 80px;
+        }
+    }
+
+    &__name
+    {
+        max-width: 80px;
+        word-wrap: break-word;
+    }
+}

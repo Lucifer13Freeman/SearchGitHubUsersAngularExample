@@ -1,0 +1,17 @@
+<main>
+    <form class="container">
+        <div class="container__search">
+            <h3>Search GitHub Users</h3>
+            <input
+                class="search"
+                type="search" 
+                [formControl]="searchInput"
+                placeholder="Username..."
+            />
+        </div>
+    </form>
+
+    <app-users></app-users>
+
+    <app-error *ngIf="error"></app-error>
+</main>
