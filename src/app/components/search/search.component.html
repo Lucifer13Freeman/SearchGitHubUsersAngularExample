@@ -1,17 +1,20 @@
 <main>
     <form class="container">
         <div class="container__search">
-            <h3>Search GitHub Users</h3>
+            <h2>Search GitHub Users</h2>
             <input
                 class="search"
                 type="search" 
                 [formControl]="searchInput"
                 placeholder="Username..."
             />
+            <ng-container *ngIf="totalCount !== 0">
+                <p>Users found: {{totalCount}}</p>
+            </ng-container>
         </div>
     </form>
 
-    <app-users></app-users>
+    <app-users-list [users]="users"></app-users-list>
 
-    <app-error *ngIf="error"></app-error>
+    <app-error *ngIf="error" [text]="'Users Not Found...'"></app-error>
 </main>

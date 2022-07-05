@@ -1,34 +1,16 @@
-export class User 
+import { IUser } from "../interfaces/user.interface";
+
+export class User implements IUser
 {
-    login!: string;
-    id!: number;
-    node_id!: string;
-    avatar_url!: string;
-    gravatar_id!: string;
-    url!: string;
-    html_url!: string;
-    followers_url!: string;
-    following_url!: string;
-    gists_url!: string;
-    starred_url!: string;
-    subscriptions_url!: string;
-    organizations_url!: string;
-    repos_url!: string;
-    events_url!: string;
-    received_events_url!: string;
-    type!: string;
-    site_admin!: boolean;
-    name!: string;
-    company!: string;
-    blog!: string;
-    location!: string;
-    email!: string;
-    hireable!: string;
-    bio!: string;
-    public_repos!: number;
-    public_gists!: number;
-    followers!: number;
-    following!: number;
-    created_at!: string;
-    updated_at!: string;
+    readonly login!: string;
+    readonly id!: number;
+    readonly avatar_url!: string;
+    readonly url!: string;
+    readonly html_url!: string;
+    readonly name!: string;
+    readonly bio!: string;
+    readonly public_repos!: number;
+    readonly public_gists!: number;
+    readonly followers!: number;
+    readonly following!: number;
 }

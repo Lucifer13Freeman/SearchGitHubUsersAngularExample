@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 :root {
-    --primary-color: #dc3545;
+    --red-color: #dc3546a8;
     --dark-color: #333333;
     --light-color: #f4f4f4f4;
 }
@@ -21,6 +21,15 @@ body {
     color: #333;
 }
 
+header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    background-color: var(--red-color);
+    z-index: 10;
+}
+
 a {
     // color: var(--primary-color);
     text-decoration: none;
@@ -37,8 +46,8 @@ ul {
 input {
     display: block;
     width: 100%;
-    padding: .4rem;
-    font-size: 1.2rem;
+    padding: .8rem;
+    font-size: 1.4rem;
     border: 1px solid #ccc;
     outline: none;
     margin-bottom: .5rem;
@@ -65,4 +74,8 @@ main
         transition-property: margin;
         transition-duration: .2s;
     }
+}
+
+.text-center {
+    text-align: center;
 }

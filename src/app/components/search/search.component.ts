@@ -1,10 +1,10 @@
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { EMPTY, Subscription } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, 
+        filter, map, switchMap, tap } from 'rxjs/operators';
 import { User } from 'src/app/models/user.model';
 import { GithubService } from 'src/app/services/github.service';
-import { UsersService } from 'src/app/services/users.service';
 
 
 @Component(
@@ -21,20 +21,29 @@ export class SearchComponent implements OnInit, OnDestroy
   submit = new EventEmitter<string>();
 
   users: User[] = [];
+  totalCount: number = 0;
   error: boolean = false;
 
   searchSubs?: Subscription;
 
-  constructor(private readonly githubService: GithubService,
-              private readonly usersService: UsersService) { }
+  constructor(private readonly githubService: GithubService) { }
 
   ngOnInit(): void 
   { 
+    this.searchUsers();
+  }
+
+  searchUsers()
+  {
     this.searchSubs = this.searchInput.valueChanges
       .pipe(
         map((searchText: string) => {
           const text = searchText.trim();
-          if (text === '') this.clearUsers();
+          if (text === '') 
+          {
+            this.clearUsers();
+            this.error = false;
+          }
           return text;
         }),
         debounceTime(500),
@@ -49,8 +58,8 @@ export class SearchComponent implements OnInit, OnDestroy
       {
         next: res => {
           this.users = res.items;
-          this.usersService.setUsers(this.users);
-          this.error = false;
+          this.totalCount = res.total_count;
+          this.error = res.items.length === 0;
         },
         error: err => this.onError()
       });
@@ -64,7 +73,7 @@ export class SearchComponent implements OnInit, OnDestroy
   clearUsers()
   {
     this.users = [];
-    this.usersService.clearUsers();
+    this.totalCount = 0;
   }
 
   onError()

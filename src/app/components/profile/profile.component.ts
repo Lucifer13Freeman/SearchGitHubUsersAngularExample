@@ -5,6 +5,7 @@ import { Repo } from 'src/app/models/repo.model';
 import { User } from 'src/app/models/user.model';
 import { GithubService } from 'src/app/services/github.service';
 import { UsersService } from 'src/app/services/users.service';
+import { environment } from 'src/environments/environment';
 
 @Component(
 {
@@ -18,34 +19,35 @@ export class ProfileComponent implements OnInit, OnDestroy
   error: boolean = false;
 
   profileSubs?: Subscription;
-  followersSubs?: Subscription;
-  reposSubs?: Subscription;
 
   followers: User[] = [];
   repos: Repo[] = [];
+  following: User[] = [];
+
+  baseUrl: string = environment.BASE_URL;
   
   constructor(private route: ActivatedRoute,
-              private readonly githubService: GithubService,
-              private readonly usersService: UsersService) { }
+              private readonly githubService: GithubService) { }
 
   ngOnInit(): void 
   { 
     this.route.params.subscribe(params => {
-      const username = params['name'];
-      this.getProfile(username);
+      const login = params['name'];
+      this.getProfile(login);
     });
   }
 
-  getProfile(name: string)
+  getProfile(username: string)
   {
-    this.profileSubs = this.githubService.getUser(name).pipe(
+    this.profileSubs = this.githubService.getUser(username).pipe(
       mergeMap(user => {
         this.user = user;
 
-        const followers = this.githubService.getFollowersByUser(name);
-        const repos = this.githubService.getReposByUser(name);
+        const followers = this.githubService.getFollowersByUser({ login: username });
+        const repos = this.githubService.getReposByUser({ login: username });
+        const subscriptions = this.githubService.getFollowingByUser({ login: username });
 
-        return forkJoin({ followers, repos });
+        return forkJoin({ followers, repos, subscriptions });
       }),
       catchError(err => this.onError()),
     )
@@ -53,8 +55,8 @@ export class ProfileComponent implements OnInit, OnDestroy
     {
       next: res => {
         this.followers = res.followers;
-        this.usersService.setUsers(this.followers);
         this.repos = res.repos;
+        this.following = res.subscriptions;
       },
       error: err => this.onError()
     });
@@ -63,18 +65,16 @@ export class ProfileComponent implements OnInit, OnDestroy
   ngOnDestroy(): void
   {
     this.profileSubs?.unsubscribe();
-    this.followersSubs?.unsubscribe();
   }
 
-  clearUsers()
+  clearFollowers()
   {
     this.followers = [];
-    this.usersService.clearUsers();
   }
 
   onError()
   {
-    this.clearUsers();
+    this.clearFollowers();
     this.error = true;
     return EMPTY;
   }

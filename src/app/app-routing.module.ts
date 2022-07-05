@@ -6,13 +6,7 @@ import { SearchComponent } from './components/search/search.component';
 import { User } from './models/user.model';
 
 const routes: Routes = [
-  { path: 'search', component: SearchComponent, 
-    // children: [{
-    //   path: 'profile/:id',
-    //   component: ProfileComponent,
-    //   data: { user: User }
-    // }] 
-  },
+  { path: 'search', component: SearchComponent },
   { path: 'profile/:name', component: ProfileComponent },
   { path: '', redirectTo: '/search', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent  }

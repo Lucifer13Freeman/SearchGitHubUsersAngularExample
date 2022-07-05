@@ -1,0 +1,11 @@
+
+.container
+{
+    display: flex;
+
+    &__users
+    {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}

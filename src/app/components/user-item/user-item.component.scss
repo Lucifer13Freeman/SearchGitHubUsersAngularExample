@@ -1,17 +1,3 @@
-
-.container
-{
-    display: flex;
-    // justify-content: flex-start;
-
-    &__users
-    {
-        display: flex;
-        // justify-content: center;
-        flex-wrap: wrap;
-    }
-}
-
 .user {
     cursor: pointer;
     display: flex;

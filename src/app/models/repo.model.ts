@@ -1,83 +1,28 @@
-import { User } from "./user.model";
+import { IRepo } from "../interfaces/repo.interface";
 
-export class Repo
+export class Repo implements IRepo
 {
-    allow_forking?: boolean;
-    archive_url?: string;
-    archived?: false
-    assignees_url?: string;
-    blobs_url?: string;
-    branches_url?: string;
-    clone_url?: string;
-    collaborators_url?: string;
-    comments_url?: string;
-    commits_url?: string;
-    compare_url?: string;
-    contents_url?: string;
-    contributors_url?: string;
-    created_at?: string;
-    default_branch?: string;
-    deployments_url?: string;
-    description?: string;
-    disabled?: false
-    downloads_url?: string;
-    events_url?: string;
-    fork?: boolean;
-    forks?: number;
-    forks_count?: number;
-    forks_url?: string;
-    full_name?: string;
-    git_commits_url?: string;
-    git_refs_url?: string;
-    git_tags_url?: string;
-    git_url?: string;
-    has_downloads?: boolean;
-    has_issues?: boolean;
-    has_pages?: boolean;
-    has_projects?: boolean;
-    has_wiki?: boolean;
-    homepage?: any;
-    hooks_url?: string;
-    html_url?: string;
-    id?: number;
-    is_template?: false
-    issue_comment_url?: string;
-    issue_events_url?: string;
-    issues_url?: string;
-    keys_url?: string;
-    labels_url?: string;
-    language?: string;
-    languages_url?: string;
-    license?: any
-    merges_url?: string;
-    milestones_url?: string;
-    mirror_url?: any
-    name?: string;
-    node_id?: string;
-    notifications_url?: string;
-    open_issues?: number;
-    open_issues_count?: number;
-    owner?: User;
-    private?: false;
-    pulls_url?: string;
-    pushed_at?: string;
-    releases_url?: string;
-    size?: number
-    ssh_url?: string;
-    stargazers_count?: number;
-    stargazers_url?: string;
-    statuses_url?: string;
-    subscribers_url?: string;
-    subscription_url?: string;
-    svn_url?: string;
-    tags_url?: string;
-    teams_url?: string;
-    topics?: any[];
-    trees_url?: string;
-    updated_at?: string;
-    url?: string;
-    visibility?: string;
-    watchers?: number;
-    watchers_count?: number;
-    web_commit_signoff_required?: boolean;
+    readonly allow_forking?: boolean;
+    readonly description?: string;
+    readonly disabled?: false;
+    readonly forks?: number;
+    readonly forks_count?: number;
+    readonly full_name!: string;
+    readonly git_commits_url?: string;
+    readonly git_refs_url?: string;
+    readonly git_tags_url?: string;
+    readonly git_url?: string;
+    readonly html_url!: string;
+    readonly id!: number;
+    readonly license?: any
+    readonly name!: string;
+    readonly node_id?: string;
+    readonly open_issues?: number;
+    readonly open_issues_count?: number;
+    readonly private?: false;
+    readonly stargazers_count?: number;
+    readonly url?: string;
+    readonly visibility?: string;
+    readonly watchers?: number;
+    readonly watchers_count?: number;
 }

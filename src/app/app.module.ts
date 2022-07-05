@@ -8,12 +8,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { ProfileComponent } from './components/profile/profile.component';
 import { ErrorComponent } from './components/error/error.component';
 import { SearchComponent } from './components/search/search.component';
-import { UsersComponent } from './components/users/users.component';
+import { UsersListComponent } from './components/users-list/users-list.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { GithubService } from './services/github.service';
-import { UsersService } from './services/users.service';
-import { ProfileService } from './services/profile.service';
 import { ReposComponent } from './components/repos/repos.component';
+import { UserItemComponent } from './components/user-item/user-item.component';
 
 
 @NgModule(
@@ -23,9 +22,10 @@ import { ReposComponent } from './components/repos/repos.component';
     ProfileComponent,
     ErrorComponent,
     SearchComponent,
-    UsersComponent,
+    UsersListComponent,
     NotFoundComponent,
-    ReposComponent
+    ReposComponent,
+    UserItemComponent
   ],
   imports: [
     BrowserModule,
@@ -34,9 +34,7 @@ import { ReposComponent } from './components/repos/repos.component';
     HttpClientModule
   ],
   providers: [
-    GithubService,
-    UsersService,
-    ProfileService
+    GithubService
   ],
   bootstrap: [AppComponent]
 })

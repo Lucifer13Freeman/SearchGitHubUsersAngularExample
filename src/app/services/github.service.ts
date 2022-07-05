@@ -1,16 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Repo } from '../models/repo.model';
-import { User } from '../models/user.model';
+import { environment } from 'src/environments/environment';
+import { GetListByLoginDto } from '../dto/get-list-by-login.dto';
+import { IUsersListResponse } from '../interfaces/users-list-response.interface';
+import { IRepo } from '../interfaces/repo.interface';
+import { IUser } from '../interfaces/user.interface';
 
-
-interface ISearchResponse
-{
-  items: User[];
-  incomplete_results: boolean;
-  total_count: number;
-}
 
 @Injectable(
 {
@@ -18,44 +14,41 @@ interface ISearchResponse
 })
 export class GithubService 
 {
-  static getUserUrl = 'https://api.github.com/users/';
-  static searchUsersUrl = 'https://api.github.com/search/users?q=';
+  private static getUserUrl = `${environment.API_BASE_URL}users/`;
+  private static searchUsersUrl = `${environment.API_BASE_URL}search/users?q=`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
-  getUser(name: string): Observable<User> 
+  getUser(login: string): Observable<IUser> 
   {
-    const url = GithubService.getUserUrl + name;
-    return this.http.get<User>(url);
+    const url = GithubService.getUserUrl + login;
+    return this.http.get<IUser>(url);
   }
 
-  searchUsers(name: string): Observable<ISearchResponse>
+  searchUsers(login: string): Observable<IUsersListResponse>
   {
-    const url = GithubService.searchUsersUrl + name;
-    return this.http.get<ISearchResponse>(url);
+    const url = GithubService.searchUsersUrl + login;
+    return this.http.get<IUsersListResponse>(url);
   }
 
-  getFollowersByUser(name: string, 
-                    perPage: number = 100, 
-                    page: number = 1): Observable<User[]>
+  getFollowersByUser(dto: GetListByLoginDto): Observable<IUser[]>
   {
-    const url = `${GithubService.getUserUrl}${name}/followers?per_page=${perPage}&page=${page}`;
-    return this.http.get<User[]>(url);
+    const { login, page, perPage } = dto;
+    const url = `${GithubService.getUserUrl}${login}/followers?per_page=${perPage}&page=${page}`;
+    return this.http.get<IUser[]>(url);
   }
 
-  getReposByUser(name: string, 
-                perPage: number = 100, 
-                page: number = 1): Observable<Repo[]>
+  getReposByUser(dto: GetListByLoginDto): Observable<IRepo[]>
   {
-    const url = `${GithubService.getUserUrl}${name}/repos?per_page=${perPage}&page=${page}`;
-    return this.http.get<Repo[]>(url);
+    const { login, page, perPage } = dto;
+    const url = `${GithubService.getUserUrl}${login}/repos?per_page=${perPage}&page=${page}`;
+    return this.http.get<IRepo[]>(url);
   }
 
-  getSubscriptionsByUser(name: string, 
-                        perPage: number = 100, 
-                        page: number = 1): Observable<Repo[]>
+  getFollowingByUser(dto: GetListByLoginDto): Observable<IUser[]>
   {
-    const url = `${GithubService.getUserUrl}${name}/repos?per_page=${perPage}&page=${page}`;
-    return this.http.get<Repo[]>(url);
+    const { login, page, perPage } = dto;
+    const url = `${GithubService.getUserUrl}${login}/following?per_page=${perPage}&page=${page}`;
+    return this.http.get<IUser[]>(url);
   }
 }
