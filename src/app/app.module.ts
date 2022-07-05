@@ -4,28 +4,29 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ProfileComponent } from './components/profile/profile.component';
 import { ErrorComponent } from './components/error/error.component';
 import { SearchComponent } from './components/search/search.component';
-import { UsersListComponent } from './components/users-list/users-list.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { GithubService } from './services/github.service';
 import { ReposComponent } from './components/repos/repos.component';
 import { UserItemComponent } from './components/user-item/user-item.component';
+import { LoaderComponent } from './components/loader/loader.component';
+import { LoadingService } from './services/loading.service';
+import { NetworkInterceptor } from './interceptors/network.interceptor';
 
 
-@NgModule(
-{
+@NgModule({
   declarations: [
     AppComponent,
     ProfileComponent,
     ErrorComponent,
     SearchComponent,
-    UsersListComponent,
     NotFoundComponent,
     ReposComponent,
-    UserItemComponent
+    UserItemComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +35,13 @@ import { UserItemComponent } from './components/user-item/user-item.component';
     HttpClientModule
   ],
   providers: [
-    GithubService
+    GithubService,
+    LoadingService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: NetworkInterceptor,
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent]
 })

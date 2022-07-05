@@ -1,65 +1,59 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { EMPTY, Subscription } from 'rxjs';
+import { EMPTY, ReplaySubject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
-        filter, map, switchMap, tap } from 'rxjs/operators';
+        filter, map, switchMap, takeUntil } from 'rxjs/operators';
+import { IUser } from 'src/app/interfaces/user.interface';
 import { Pageable } from 'src/app/models/pageable.model';
-import { User } from 'src/app/models/user.model';
 import { GithubService } from 'src/app/services/github.service';
+import { LoadingService } from 'src/app/services/loading.service';
 
 
-@Component(
-{
+@Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+  styleUrls: ['./search.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchComponent implements OnInit, OnDestroy
-{
+export class SearchComponent implements OnInit, OnDestroy {
+
   private DEBOUNCE: number = 500;
-  private USERS_PER_PAGE: number = 100;
-
-  searchInput = new FormControl();
-
-  @Output() 
-  submit = new EventEmitter<string>();
-
-  users: User[] = [];
-  error: boolean = false;
-
-  searchSubs?: Subscription;
-
-  pageable!: Pageable;
+  private USERS_PER_PAGE: number = 20;
   
-  searchText: string = '';
+  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+  private searchText: string = '';
 
-  constructor(private readonly githubService: GithubService) { }
+  public searchInput = new FormControl();
+  public pageable!: Pageable;
 
-  ngOnInit(): void 
-  { 
+  public users: IUser[] = [];
+  public error: boolean = false;
+
+  public loading$ = this.loadingService.getLoading();
+
+  constructor(private readonly githubService: GithubService,
+              private loadingService: LoadingService) { }
+
+  public ngOnInit(): void { 
     this.pageable = new Pageable(this.USERS_PER_PAGE);
     this.searchUsers();
   }
 
-  searchUsers()
-  {
-    this.searchSubs = this.searchInput.valueChanges
+  public searchUsers() {
+    this.searchInput.valueChanges
       .pipe(
         map((searchText: string) => {
           const text = searchText.trim();
-          if (text === '') 
-          {
+          if (text === '') {
             this.clearUsers();
             this.error = false;
           }
           return text;
         }),
+        filter((searchText: string) => searchText !== ''),
         debounceTime(this.DEBOUNCE),
         distinctUntilChanged(),
-        filter((searchText: string) => searchText !== ''),
-        tap((searchText: string) => this.submit.emit(searchText)),
-        switchMap((searchText: string) => 
-        { 
+        switchMap((searchText: string) => { 
           this.searchText = searchText;
 
           return this.githubService.searchUsers({ 
@@ -67,53 +61,49 @@ export class SearchComponent implements OnInit, OnDestroy
             page: this.pageable.currentPage,
             perPage: this.pageable.maxPerPage 
           });
-        }))
-        .pipe(
-          catchError(err => this.onError())
-        )
-        .subscribe(
-        {
-          next: res => {
-            this.users = res.items;
-            this.pageable.totalItemsCount = res.total_count;
-            this.error = res.items.length === 0;
-          },
-          error: err => this.onError()
-        });
+        }),
+        takeUntil(this.destroyed$),
+        catchError(err => this.onError())
+      )
+      .subscribe({
+        next: res => {
+          this.users = res.items;
+          this.pageable.totalItemsCount = res.total_count;
+          this.error = res.items.length === 0;
+        },
+        error: err => this.onError()
+      });
   }
   
-  ngOnDestroy(): void 
-  {
-    this.searchSubs?.unsubscribe();
+  public ngOnDestroy(): void {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
   }
 
-  clearUsers()
-  {
+  private clearUsers() {
     this.users = [];
     this.pageable.totalItemsCount = 0;
   }
 
-  onError()
-  {
+  private onError() {
     this.clearUsers();
     this.error = true;
     return EMPTY;
   }
 
-  loadMore()
-  {
+  public loadMore() {
     this.pageable.currentPage++;
     
-    this.searchSubs = this.githubService.searchUsers({ 
+    this.githubService.searchUsers({ 
       login: this.searchText, 
       page: this.pageable.currentPage,
       perPage: this.pageable.maxPerPage 
     })
     .pipe(
+      takeUntil(this.destroyed$),
       catchError(err => this.onError())
     )
-    .subscribe(
-    {
+    .subscribe({
       next: res => {
         this.users.push(...res.items);
         this.error = false;
@@ -122,8 +112,8 @@ export class SearchComponent implements OnInit, OnDestroy
     });
   }
 
-  showLoadMoreBtn()
-  {
-    return this.pageable.totalItemsCount !== 0 && this.pageable.totalItemsCount > this.users.length;
+  public showLoadMoreBtn() {
+    return this.pageable.totalItemsCount !== 0 
+          && this.pageable.totalItemsCount > this.users.length;
   }
 }

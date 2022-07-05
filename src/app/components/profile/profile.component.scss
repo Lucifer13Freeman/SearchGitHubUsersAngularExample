@@ -1,3 +1,6 @@
+@import './../../styles/main';
+
+
 .github-card {
     text-align: center;
     border-radius: 5px;
@@ -75,7 +78,6 @@
     }
 }
 
-
 .profile-card { 
     .header {
         background-image: url('https://cdn-images-1.medium.com/max/2000/1*19LWzzJJDPqGq67Vyd0EjQ.jpeg');
@@ -122,6 +124,36 @@ section {
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
+    }
+    .wrap {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    button {
+        background: var(--red-color);
+        color: var(--white-color);
+        font-size: 1.5rem;
+        border-radius: 10px;
+        padding: 0.5rem 1.5rem;
+        display: block;
+        width: 100%;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        outline: none;
+        position: relative;
+        bottom: 0;
+        max-width: 16rem;
+
+        &:disabled {
+            background: var(--dark-color);
+            color: var(--white-color);
+            cursor: not-allowed;
+        }
+        &:hover:not(:disabled) {
+            opacity: .8;
+        }
     }
 
     @media screen and (max-width: 800px)  

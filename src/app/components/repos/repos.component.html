@@ -1,13 +1,8 @@
-<div>
-    <ul *ngIf="repos.length; else noRepos">
-        <li class="repo" *ngFor="let repo of repos; let i = index">
-            <span>
-                <strong>{{i + 1}}.</strong>
-                <a [href]="repo.html_url">{{repo.full_name}}</a>
-            </span>
-        </li>
-    </ul>
-    <ng-template #noRepos>
-        <p class="text-center">No repos yet...</p>
-    </ng-template>
-</div>
+
+<ul *ngIf="repos.length; else noRepos">
+    <li class="repo" *ngFor="let repo of repos; let i = index">
+        <strong>{{i + 1}}.</strong>
+        <a [href]="repo.html_url">{{repo.full_name}}</a>
+    </li>
+</ul>
+<ng-template #noRepos><p>No repos yet...</p></ng-template>

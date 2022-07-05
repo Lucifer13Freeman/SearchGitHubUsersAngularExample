@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SearchComponent } from './components/search/search.component';
-import { User } from './models/user.model';
 
 const routes: Routes = [
   { path: 'search', component: SearchComponent },
@@ -12,8 +11,7 @@ const routes: Routes = [
   { path: '**', component: NotFoundComponent  }
 ];
 
-@NgModule(
-{
+@NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })

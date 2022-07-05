@@ -1,47 +1,62 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, 
+        Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, EMPTY, forkJoin, mergeMap, Subscription } from 'rxjs';
+import { catchError, EMPTY, forkJoin, mergeMap, Observable, of, 
+        ReplaySubject, takeUntil } from 'rxjs';
+import { ErrorTypeEnum } from 'src/app/enums/error-type.enum';
 import { LoadMoreEnum } from 'src/app/enums/load-more.enum';
+import { IRepo } from 'src/app/interfaces/repo.interface';
+import { IUser } from 'src/app/interfaces/user.interface';
 import { Pageable } from 'src/app/models/pageable.model';
-import { Repo } from 'src/app/models/repo.model';
-import { User } from 'src/app/models/user.model';
 import { GithubService } from 'src/app/services/github.service';
+import { LoadingService } from 'src/app/services/loading.service';
 import { environment } from 'src/environments/environment';
 
-@Component(
-{
+
+@Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  styleUrls: ['./profile.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProfileComponent implements OnInit, OnDestroy 
-{
+export class ProfileComponent implements OnInit, OnDestroy {
+
   private FOLLOWERS_PER_PAGE = 10;
   private FOLLOWING_PER_PAGE = 10;
   private REPOS_PER_PAGE = 10;
 
-  user!: User;
-  error: boolean = false;
+  public user!: IUser;
+  public errors = {
+    user: false,
+    followers: false,
+    following: false,
+    repos: false
+  }
 
-  profileSubs?: Subscription;
+  public followersLoading: LoadMoreEnum = LoadMoreEnum.FOLLOWERS;
+  public followingLoading: LoadMoreEnum = LoadMoreEnum.FOLLOWING;
+  public reposLoading: LoadMoreEnum = LoadMoreEnum.REPOS;
 
-  followers: User[] = [];
-  repos: Repo[] = [];
-  following: User[] = [];
+  public followers: IUser[] = [];
+  public repos: IRepo[] = [];
+  public following: IUser[] = [];
 
-  followersPageable!: Pageable;
-  reposPageable!: Pageable;
-  followingPageable!: Pageable;
+  public followersPageable!: Pageable;
+  public reposPageable!: Pageable;
+  public followingPageable!: Pageable;
 
-  baseUrl: string = environment.BASE_URL;
+  public baseUrl: string = environment.BASE_URL;
 
-  // loadMoreEnum!: LoadMoreEnum;
+  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+  public loading$ = this.loadingService.getLoading();
+
   
   constructor(private route: ActivatedRoute,
-              private readonly githubService: GithubService) { }
+              private readonly changeDetector: ChangeDetectorRef,
+              private readonly githubService: GithubService,
+              private loadingService: LoadingService) { }
 
-  ngOnInit(): void 
-  { 
+  public ngOnInit(): void { 
     this.route.params.subscribe(params => {
       const login = params['login'];
       this.getProfile(login);
@@ -50,16 +65,15 @@ export class ProfileComponent implements OnInit, OnDestroy
     this.initPageables();
   }
 
-  initPageables()
-  {
+  private initPageables(): void {
     this.followersPageable = new Pageable(this.FOLLOWERS_PER_PAGE);
     this.followingPageable = new Pageable(this.FOLLOWING_PER_PAGE);
     this.reposPageable = new Pageable(this.REPOS_PER_PAGE);
   }
 
-  getProfile(login: string)
-  {
-    this.profileSubs = this.githubService.getUser(login).pipe(
+  private getProfile(login: string): void {
+
+    this.githubService.getUser(login).pipe(
       mergeMap(user => {
         this.user = user;
 
@@ -71,121 +85,167 @@ export class ProfileComponent implements OnInit, OnDestroy
           login, 
           page: this.followersPageable.currentPage,
           perPage: this.followersPageable.maxPerPage 
-        });
+        }).pipe(catchError(err => {
+          this.onError(ErrorTypeEnum.FOLLOWERS); 
+          return of([]);
+        }));
+
         const repos = this.githubService.getReposByUser({ 
           login, 
-          page: this.followersPageable.currentPage,
-          perPage: this.followersPageable.maxPerPage 
-        });
-        const subscriptions = this.githubService.getFollowingByUser({ 
-          login, 
-          page: this.followersPageable.currentPage,
-          perPage: this.followersPageable.maxPerPage 
-        });
+          page: this.reposPageable.currentPage,
+          perPage: this.reposPageable.maxPerPage 
+        }).pipe(catchError(err => {
+          this.onError(ErrorTypeEnum.REPOS); 
+          return of([]);
+        }));
 
-        return forkJoin({ followers, repos, subscriptions });
+        const following = this.githubService.getFollowingByUser({ 
+          login, 
+          page: this.followingPageable.currentPage,
+          perPage: this.followingPageable.maxPerPage 
+        }).pipe(catchError(err => {
+          this.onError(ErrorTypeEnum.FOLLOWING); 
+          return of([]);
+        }));
+
+        return forkJoin([ followers, repos, following ]);
       }),
-      catchError(err => this.onError()),
+      takeUntil(this.destroyed$),
     )
-    .subscribe(
-    {
+    .subscribe({
       next: res => {
-        this.followers = res.followers;
-        this.repos = res.repos;
-        this.following = res.subscriptions;
+        this.followers = res[0];
+        this.repos = res[1];
+        this.following = res[2];
+
+        this.changeDetector.detectChanges();
       },
       error: err => this.onError()
     });
   }
 
-  getFollowers()
-  {
+  private loadMoreFollowers(): void {
     this.githubService.getFollowersByUser({ 
       login: this.user.login, 
       page: this.followersPageable.currentPage,
       perPage: this.followersPageable.maxPerPage 
-    }).subscribe({
-      next: followers => this.followers = followers,
+    })
+    .pipe(
+      takeUntil(this.destroyed$),
+      catchError(err => {
+        this.onError(ErrorTypeEnum.FOLLOWERS); 
+        return of([]);
+    }))
+    .subscribe({
+      next: followers => this.followers = [...this.followers, ...followers],
       error: err => this.onError()
     });
   }
 
-  getFollowing()
-  {
+  private loadMoreFollowing(): void {
     this.githubService.getFollowingByUser({ 
       login: this.user.login, 
       page: this.followingPageable.currentPage,
       perPage: this.followingPageable.maxPerPage 
-    }).subscribe({
-      next: following => this.following = following,
+    })
+    .pipe(
+      takeUntil(this.destroyed$),
+      catchError(err => {
+        this.onError(ErrorTypeEnum.FOLLOWING); 
+        return of([]);
+    }))
+    .subscribe({
+      next: following => this.following = [...this.following, ...following],
       error: err => this.onError()
     });
   }
 
-  getRepos()
-  {
+  private loadMoreRepos(): void {
     this.githubService.getReposByUser({ 
       login: this.user.login, 
       page: this.reposPageable.currentPage,
       perPage: this.reposPageable.maxPerPage 
-    }).subscribe({
-      next: repos => this.repos = repos,
+    })
+    .pipe(
+      takeUntil(this.destroyed$),
+      catchError(err => {
+        this.onError(ErrorTypeEnum.REPOS); 
+        return of([]);
+    }))
+    .subscribe({
+      next: repos => this.repos = [...this.repos, ...repos],
       error: err => this.onError()
     });
   }
 
-  // loadMore(type: LoadMoreEnum)
-  // {
-  //   switch (type) 
-  //   {
-  //     case LoadMoreEnum.FOLLOWERS:
-  //     {
-  //       this.followersPageable.currentPage++;
-  //       this.getFollowers();
-  //       break;
-  //     }
-  //     case LoadMoreEnum.FOLLOWING:
-  //     {
-  //       this.followingPageable.currentPage++;
-  //       this.getFollowing();
-  //       break;
-  //     }
-  //     case LoadMoreEnum.REPOS:
-  //     {
-  //       this.reposPageable.currentPage++;
-  //       this.getRepos();
-  //       break;
-  //     }
-  //     default: break;
-  //   }
-  // }
-
-  ngOnDestroy(): void
-  {
-    this.profileSubs?.unsubscribe();
+  public loadMore(type: LoadMoreEnum): void {
+    switch (type) {
+      case LoadMoreEnum.FOLLOWERS:
+        this.followersPageable.currentPage++;
+        this.loadMoreFollowers();
+        break;
+      case LoadMoreEnum.FOLLOWING:
+        this.followingPageable.currentPage++;
+        this.loadMoreFollowing();
+        break;
+      case LoadMoreEnum.REPOS:
+        this.reposPageable.currentPage++;
+        this.loadMoreRepos();
+        break;
+      default: break;
+    }
   }
 
-  clearFollowers()
-  {
+  public showLoadMoreBtn(type: LoadMoreEnum): boolean {
+    switch (type) {
+      case LoadMoreEnum.FOLLOWERS:
+        return this.followersPageable.totalItemsCount > this.followers.length;
+      case LoadMoreEnum.FOLLOWING:
+        return this.followingPageable.totalItemsCount > this.following.length;
+      case LoadMoreEnum.REPOS:
+        return this.reposPageable.totalItemsCount > this.repos.length;
+      default: 
+        return false;
+    }
+  }
+
+  public ngOnDestroy(): void {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
+  }
+
+  private clearFollowers(): void {
     this.followers = [];
   }
 
-  clearFollowing()
-  {
+  private clearFollowing(): void {
     this.following = [];
   }
 
-  clearRepos()
-  {
+  private clearRepos(): void { 
     this.repos = [];
   }
 
-  onError()
-  {
-    this.clearFollowers();
-    this.clearFollowing();
-    this.clearRepos();
-    this.error = true;
+  private onError(type: ErrorTypeEnum = ErrorTypeEnum.USER): Observable<never> {
+    switch (type) {
+      default: 
+      case ErrorTypeEnum.USER:
+        this.errors.user = true;
+        break;
+      case ErrorTypeEnum.FOLLOWERS:
+        this.errors.followers = true;
+        this.clearFollowers();
+        break;
+      case ErrorTypeEnum.FOLLOWING:
+        this.errors.following = true;
+        this.clearFollowing();
+        break;
+      case ErrorTypeEnum.REPOS:
+        this.errors.repos = true;
+        this.clearRepos();
+        break;
+    }
+
     return EMPTY;
   }
 }

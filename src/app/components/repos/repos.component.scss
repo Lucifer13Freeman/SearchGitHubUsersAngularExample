@@ -1,5 +1,10 @@
+
+ul {
+    list-style: none;
+}
+
 section {
-    border: 1px solid #000;
+    border: 1px solid black;
     padding: 1rem;
 
     header {
@@ -7,15 +12,23 @@ section {
     }
 }
 
+p {
+    text-align: center;
+}
+
 .repo {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: .4rem 1rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--light-color);
     margin-bottom: .5rem;
 
     a {
         color: var(--dark-color);
+        text-decoration: none;
+
+        &:hover {
+            color: #666;
+        }
     }
 }

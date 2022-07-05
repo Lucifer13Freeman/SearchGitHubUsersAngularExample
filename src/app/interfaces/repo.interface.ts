@@ -1,8 +1,7 @@
 import { IUser } from "./user.interface";
 
 
-export interface IRepo
-{
+export interface IRepo {
     allow_forking?: boolean;
     archive_url?: string;
     archived?: false;

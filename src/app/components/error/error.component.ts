@@ -1,19 +1,18 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
 
-@Component(
-{
+@Component({
   selector: 'app-error',
   templateUrl: './error.component.html',
   styleUrls: ['./error.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ErrorComponent implements OnInit 
-{
+export class ErrorComponent implements OnInit {
+
   @Input()
-  text: string = 'Not found';
+  public text: string = 'Not found';
 
   constructor() { }
 
-  ngOnInit(): void { }
+  public ngOnInit(): void { }
 }

@@ -1,5 +1,4 @@
-export enum LoadMoreEnum
-{
+export enum LoadMoreEnum {
     SEARCH_USERS = "SEARCH_USERS",
     FOLLOWERS = "FOLLOWERS",
     FOLLOWING = "FOLLOWING",

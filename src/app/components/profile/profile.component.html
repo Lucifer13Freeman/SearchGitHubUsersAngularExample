@@ -1,4 +1,4 @@
-<main *ngIf="user; else noUser">
+<main *ngIf="user">
     <div class="github-card profile-card">
         <div class="header User"></div>
         <a class="avatar" [href]="baseUrl+user.login" target="_blank">
@@ -25,27 +25,44 @@
             </ul>
         </div>
     </div>
+    <app-error *ngIf="errors.user" text="User did not load..."></app-error>
     <section>
         <div>
             <h3>Repos</h3>
             <div class="container">
                 <app-repos [repos]="repos"></app-repos>
+                <button 
+                    *ngIf="showLoadMoreBtn(reposLoading)" 
+                    (click)="loadMore(reposLoading)"
+                >Load More
+                </button>
+                <app-error *ngIf="errors.repos" text="Repos did not load..."></app-error>
             </div>
         </div>
         <div>
             <h3>Following</h3>
-            <div class="container">
-                <app-users-list [users]="following"></app-users-list>
+            <div class="container wrap">
+                <app-user-item *ngFor="let user of following" [user]="user"></app-user-item>
+                <button 
+                    *ngIf="showLoadMoreBtn(followingLoading)" 
+                    (click)="loadMore(followingLoading)"
+                >Load More
+                </button>
+                <app-error *ngIf="errors.following" text="Following did not load..."></app-error>
             </div>
         </div>
         <div>
             <h3>Followers</h3>
-            <div class="container">
-                <app-users-list [users]="followers"></app-users-list>
+            <div class="container wrap">
+                <app-user-item *ngFor="let user of followers" [user]="user"></app-user-item>
+                <button 
+                    *ngIf="showLoadMoreBtn(followersLoading)"  
+                    (click)="loadMore(followersLoading)"
+                >Load More
+                </button>
+                <app-error *ngIf="errors.followers" text="Followers did not load..."></app-error>
             </div>
         </div>
     </section>
+    <app-loader *ngIf="loading$ | async"></app-loader>
 </main>
-<ng-template #noUser>
-    <app-error [text]="'User Not Found...'"></app-error>>
-</ng-template>

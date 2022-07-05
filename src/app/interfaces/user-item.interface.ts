@@ -1,5 +1,4 @@
-export interface IUserItem 
-{
+export interface IUserItem {
     login: string;
     id: number;
     avatar_url: string;

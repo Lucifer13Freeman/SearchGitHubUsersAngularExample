@@ -1,25 +1,24 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserItem } from 'src/app/models/user-item.model';
+import { IUserItem } from 'src/app/interfaces/user-item.interface';
 
 
-@Component(
-{
+@Component({
   selector: 'app-user-item',
   templateUrl: './user-item.component.html',
-  styleUrls: ['./user-item.component.scss']
+  styleUrls: ['./user-item.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UserItemComponent implements OnInit 
-{
+export class UserItemComponent implements OnInit {
+
   @Input()
-  user!: UserItem;
+  public user!: IUserItem;
 
   constructor(private readonly router: Router) { }
 
-  ngOnInit(): void { }
+  public ngOnInit(): void { }
 
-  goToProfile(login: string)
-  {
-    login && this.router.navigate(['/profile', login]);
+  public goToProfile(login: string) {
+    this.router.navigate(['/profile', login]);
   }
 }
