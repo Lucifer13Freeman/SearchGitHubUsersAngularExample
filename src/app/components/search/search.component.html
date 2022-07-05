@@ -8,13 +8,21 @@
                 [formControl]="searchInput"
                 placeholder="Username..."
             />
-            <ng-container *ngIf="totalCount !== 0">
-                <p>Users found: {{totalCount}}</p>
+            <ng-container *ngIf="pageable.totalItemsCount !== 0">
+                <p>Users found: {{pageable.totalItemsCount}}</p>
             </ng-container>
         </div>
     </form>
 
     <app-users-list [users]="users"></app-users-list>
+
+    <ng-container *ngIf="showLoadMoreBtn()">
+        <div class="item-center">
+            <button class="btn btn__load-more" (click)="loadMore()">
+                Load More
+            </button>
+        </div>
+    </ng-container>
 
     <app-error *ngIf="error" [text]="'Users Not Found...'"></app-error>
 </main>

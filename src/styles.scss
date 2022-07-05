@@ -4,7 +4,9 @@
 :root {
     --red-color: #dc3546a8;
     --dark-color: #333333;
+    --gray-color: #afaeaeef;
     --light-color: #f4f4f4f4;
+    --white-color: #fff;
 }
 
 * {
@@ -78,4 +80,41 @@ main
 
 .text-center {
     text-align: center;
+}
+
+.btn {
+    display: inline-block;
+    background: var(--light-color);
+    color: #333;
+    padding: .4rem 1.3rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    margin-right: .5rem;
+    transition: opacity .2s;
+    outline: none;
+    
+
+    &:disabled {
+        background: var(--dark-color);
+        color: var(--white-color);
+        cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+        opacity: .8;
+    }
+
+    &__load-more {
+        background: var(--red-color);
+        color: var(--white-color);
+        font-size: 1.5rem;
+        border-radius: 10px;
+        padding: .5rem 1.5rem;
+    }
+}
+
+.item-center {
+    display: flex;
+    justify-content: center;
 }

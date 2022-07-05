@@ -1,6 +1,6 @@
 import { IUser } from "./user.interface";
 
-export interface IUsersListResponse
+export interface ISearchUsersResponse
 {
   items: IUser[];
   incomplete_results: boolean;

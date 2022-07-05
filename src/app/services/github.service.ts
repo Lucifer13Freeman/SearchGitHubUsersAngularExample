@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { GetListByLoginDto } from '../dto/get-list-by-login.dto';
-import { IUsersListResponse } from '../interfaces/users-list-response.interface';
+import { ISearchUsersResponse } from '../interfaces/search-users-response.interface';
 import { IRepo } from '../interfaces/repo.interface';
 import { IUser } from '../interfaces/user.interface';
 
@@ -25,10 +25,11 @@ export class GithubService
     return this.http.get<IUser>(url);
   }
 
-  searchUsers(login: string): Observable<IUsersListResponse>
+  searchUsers(dto: GetListByLoginDto): Observable<ISearchUsersResponse>
   {
-    const url = GithubService.searchUsersUrl + login;
-    return this.http.get<IUsersListResponse>(url);
+    const { login, page, perPage } = dto;
+    const url = `${GithubService.searchUsersUrl}${login}&per_page=${perPage}&page=${page}`;
+    return this.http.get<ISearchUsersResponse>(url);
   }
 
   getFollowersByUser(dto: GetListByLoginDto): Observable<IUser[]>

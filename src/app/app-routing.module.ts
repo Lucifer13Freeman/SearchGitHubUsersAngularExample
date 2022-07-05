@@ -7,7 +7,7 @@ import { User } from './models/user.model';
 
 const routes: Routes = [
   { path: 'search', component: SearchComponent },
-  { path: 'profile/:name', component: ProfileComponent },
+  { path: 'profile/:login', component: ProfileComponent },
   { path: '', redirectTo: '/search', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent  }
 ];
