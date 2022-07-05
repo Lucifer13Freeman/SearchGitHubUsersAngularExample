@@ -8,6 +8,7 @@ import {
 import { finalize, Observable } from 'rxjs';
 import { LoadingService } from '../services/loading.service';
 
+
 @Injectable()
 export class NetworkInterceptor implements HttpInterceptor {
 

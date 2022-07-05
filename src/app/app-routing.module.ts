@@ -4,6 +4,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SearchComponent } from './components/search/search.component';
 
+
 const routes: Routes = [
   { path: 'search', component: SearchComponent },
   { path: 'profile/:login', component: ProfileComponent },
