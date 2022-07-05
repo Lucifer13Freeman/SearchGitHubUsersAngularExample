@@ -1,5 +1,21 @@
-@import './../../styles/main';
 
+main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 20px 60px 20px;
+
+    @media screen and (min-width: 400px) {
+        padding: 60px 30px 60px 30px;
+        transition-property: margin;
+        transition-duration: .2s;
+    }
+    @media screen and (min-width: 680) {
+        padding: 60px 50px 60px 50px;
+        transition-property: margin;
+        transition-duration: .2s;
+    }
+}
 
 .container {
     display: block;
