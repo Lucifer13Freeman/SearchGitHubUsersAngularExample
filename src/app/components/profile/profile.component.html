@@ -1,24 +1,24 @@
 <main *ngIf="user; else noUser">
     <div class="github-card profile-card">
         <div class="header User"></div>
-        <a class="avatar" [href]="baseUrl+user.login">
+        <a class="avatar" [href]="baseUrl+user.login" target="_blank">
             <img [src]="user.avatar_url+'&s=80'" [alt]="user.name" />
         </a>
         <div class="content">
             <h1>{{user.name}}</h1>
             <ul class="status">
                 <li>
-                    <a [href]="baseUrl+user.login+'?tab=repositories'">
+                    <a [href]="baseUrl+user.login+'?tab=repositories'" target="_blank">
                         <strong>{{user.public_repos}}</strong>Repos
                     </a>
                 </li>
                 <li>
-                    <a [href]="baseUrl+user.login+'?tab=following'">
+                    <a [href]="baseUrl+user.login+'?tab=following'" target="_blank">
                         <strong>{{user.following}}</strong>Following
                     </a>
                 </li>
                 <li>
-                    <a [href]="baseUrl+user.login+'?tab=followers'">
+                    <a [href]="baseUrl+user.login+'?tab=followers'" target="_blank">
                         <strong>{{user.followers}}</strong>Followers
                     </a>
                 </li>
