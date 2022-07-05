@@ -8,6 +8,10 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
+
+        ::-webkit-search-cancel-button:hover { 
+            cursor: pointer;
+        }
     }
 }
 

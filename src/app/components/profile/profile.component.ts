@@ -35,7 +35,7 @@ export class ProfileComponent implements OnInit, OnDestroy
 
   baseUrl: string = environment.BASE_URL;
 
-  loadMoreEnum!: LoadMoreEnum;
+  // loadMoreEnum!: LoadMoreEnum;
   
   constructor(private route: ActivatedRoute,
               private readonly githubService: GithubService) { }
