@@ -4,7 +4,6 @@ import { catchError, EMPTY, forkJoin, mergeMap, Subscription } from 'rxjs';
 import { Repo } from 'src/app/models/repo.model';
 import { User } from 'src/app/models/user.model';
 import { GithubService } from 'src/app/services/github.service';
-import { UsersService } from 'src/app/services/users.service';
 import { environment } from 'src/environments/environment';
 
 @Component(
