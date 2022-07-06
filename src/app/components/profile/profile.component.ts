@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, 
         Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -73,6 +74,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private getProfile(login: string): void {
 
+    this.clearErrors();
+
     this.githubService.getUser(login).pipe(
       mergeMap(user => {
         this.user = user;
@@ -85,7 +88,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           login, 
           page: this.followersPageable.currentPage,
           perPage: this.followersPageable.maxPerPage 
-        }).pipe(catchError(err => {
+        }).pipe(catchError((err: HttpErrorResponse) => {
           this.onError(ErrorTypeEnum.FOLLOWERS); 
           return of([]);
         }));
@@ -94,7 +97,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           login, 
           page: this.reposPageable.currentPage,
           perPage: this.reposPageable.maxPerPage 
-        }).pipe(catchError(err => {
+        }).pipe(catchError((err: HttpErrorResponse) => {
           this.onError(ErrorTypeEnum.REPOS); 
           return of([]);
         }));
@@ -103,24 +106,30 @@ export class ProfileComponent implements OnInit, OnDestroy {
           login, 
           page: this.followingPageable.currentPage,
           perPage: this.followingPageable.maxPerPage 
-        }).pipe(catchError(err => {
+        }).pipe(catchError((err: HttpErrorResponse) => {
           this.onError(ErrorTypeEnum.FOLLOWING); 
           return of([]);
         }));
 
         return forkJoin([ followers, repos, following ]);
       }),
+      catchError(() => {
+        this.onError(ErrorTypeEnum.USER); 
+        return of([]);
+      }),
       takeUntil(this.destroyed$),
     )
     .subscribe({
-      next: res => {
+      next: (res: never[] | [IUser[] | never[], 
+                              IRepo[] | never[], 
+                              IUser[] | never[]]) => {
         this.followers = res[0];
         this.repos = res[1];
         this.following = res[2];
 
         this.changeDetector.detectChanges();
       },
-      error: err => this.onError()
+      error: (err: HttpErrorResponse) => this.onError()
     });
   }
 
@@ -132,13 +141,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     })
     .pipe(
       takeUntil(this.destroyed$),
-      catchError(err => {
+      catchError((err: HttpErrorResponse) => {
         this.onError(ErrorTypeEnum.FOLLOWERS); 
         return of([]);
     }))
     .subscribe({
-      next: followers => this.followers = [...this.followers, ...followers],
-      error: err => this.onError()
+      next: (followers: IUser[]) => this.followers = [...this.followers, ...followers],
+      error: (err: HttpErrorResponse) => this.onError()
     });
   }
 
@@ -150,13 +159,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     })
     .pipe(
       takeUntil(this.destroyed$),
-      catchError(err => {
+      catchError((err: HttpErrorResponse) => {
         this.onError(ErrorTypeEnum.FOLLOWING); 
         return of([]);
     }))
     .subscribe({
-      next: following => this.following = [...this.following, ...following],
-      error: err => this.onError()
+      next: (following: IUser[]) => this.following = [...this.following, ...following],
+      error: (err: HttpErrorResponse) => this.onError()
     });
   }
 
@@ -168,13 +177,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     })
     .pipe(
       takeUntil(this.destroyed$),
-      catchError(err => {
+      catchError((err: HttpErrorResponse) => {
         this.onError(ErrorTypeEnum.REPOS); 
         return of([]);
     }))
     .subscribe({
-      next: repos => this.repos = [...this.repos, ...repos],
-      error: err => this.onError()
+      next: (repos: IRepo[]) => this.repos = [...this.repos, ...repos],
+      error: (err: HttpErrorResponse) => this.onError()
     });
   }
 
@@ -236,6 +245,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private clearRepos(): void { 
     this.repos = [];
     this.reposPageable = new Pageable(this.REPOS_PER_PAGE);
+  }
+
+  private clearErrors(): void {
+    this.errors = {
+      user: false,
+      followers: false,
+      following: false,
+      repos: false
+    }
   }
 
   private onError(type: ErrorTypeEnum = ErrorTypeEnum.USER): Observable<never> {

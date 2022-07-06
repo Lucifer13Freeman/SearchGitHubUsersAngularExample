@@ -25,7 +25,6 @@
             </ul>
         </div>
     </div>
-    <app-error *ngIf="errors.user" text="User did not load..."></app-error>
     <section>
         <div>
             <h3>Repos</h3>
@@ -66,3 +65,4 @@
     </section>
     <app-loader *ngIf="loading$ | async"></app-loader>
 </div>
+<app-error *ngIf="errors.user" text="User did not load..."></app-error>

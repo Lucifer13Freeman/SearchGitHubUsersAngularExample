@@ -1,6 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { EMPTY, ReplaySubject, Subject } from 'rxjs';
+import { EMPTY, Subject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
         filter, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.interface';
@@ -64,11 +65,11 @@ export class SearchComponent implements OnInit, OnDestroy {
           });
         }),
         takeUntil(this.destroyed$),
-        catchError(err => this.onError())
+        catchError((err: HttpErrorResponse) => this.onError())
       )
       .subscribe({
         next: (res: ISearchUsersResponse) => this.onSearch(res),
-        error: err => this.onError()
+        error: (err: HttpErrorResponse) => this.onError()
       });
   }
   
@@ -82,11 +83,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     })
     .pipe(
       takeUntil(this.destroyed$),
-      catchError(err => this.onError())
+      catchError((err: HttpErrorResponse) => this.onError())
     )
     .subscribe({
       next: (res: ISearchUsersResponse) => this.onLoadedMore(res),
-      error: err => this.onError()
+      error: (err: HttpErrorResponse) => this.onError()
     });
   }
 
