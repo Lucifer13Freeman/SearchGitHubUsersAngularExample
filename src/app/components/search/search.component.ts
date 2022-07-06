@@ -68,7 +68,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (res: ISearchUsersResponse) => {
-          this.users = [...res.items];
+          this.users = res.items;
           this.pageable.totalItemsCount = res.total_count;
           this.error = res.items.length === 0;
         },
