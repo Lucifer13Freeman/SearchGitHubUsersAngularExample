@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, 
         Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, EMPTY, forkJoin, mergeMap, Observable, of, 
-        ReplaySubject, takeUntil } from 'rxjs';
+import { catchError, EMPTY, forkJoin, mergeMap, Observable, 
+        of, Subject, takeUntil } from 'rxjs';
 import { ErrorTypeEnum } from 'src/app/enums/error-type.enum';
 import { LoadMoreEnum } from 'src/app/enums/load-more.enum';
 import { IRepo } from 'src/app/interfaces/repo.interface';
@@ -47,7 +47,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   public baseUrl: string = environment.BASE_URL;
 
-  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+  private destroyed$: Subject<boolean> = new Subject();
   public loading$ = this.loadingService.getLoading();
 
   
@@ -199,11 +199,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
   public showLoadMoreBtn(type: LoadMoreEnum): boolean {
     switch (type) {
       case LoadMoreEnum.FOLLOWERS:
-        return this.followersPageable.totalItemsCount > this.followers.length;
+        return !this.errors.followers 
+              && this.followersPageable.totalItemsCount !== 0 
+              && !this.followersPageable.isLastPage; 
+              //this.followersPageable.totalItemsCount > this.followers.length;
       case LoadMoreEnum.FOLLOWING:
-        return this.followingPageable.totalItemsCount > this.following.length;
+        return !this.errors.following 
+              && this.followingPageable.totalItemsCount !== 0 
+              && !this.followingPageable.isLastPage; 
+              //this.followingPageable.totalItemsCount > this.following.length;
       case LoadMoreEnum.REPOS:
-        return this.reposPageable.totalItemsCount > this.repos.length;
+        return !this.errors.repos 
+              && this.reposPageable.totalItemsCount !== 0 
+              && !this.reposPageable.isLastPage; 
+              //this.reposPageable.totalItemsCount > this.repos.length;
       default: 
         return false;
     }
@@ -216,14 +225,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private clearFollowers(): void {
     this.followers = [];
+    this.followersPageable = new Pageable(this.FOLLOWERS_PER_PAGE);
   }
 
   private clearFollowing(): void {
     this.following = [];
+    this.followingPageable = new Pageable(this.FOLLOWING_PER_PAGE);
   }
 
   private clearRepos(): void { 
     this.repos = [];
+    this.reposPageable = new Pageable(this.REPOS_PER_PAGE);
   }
 
   private onError(type: ErrorTypeEnum = ErrorTypeEnum.USER): Observable<never> {

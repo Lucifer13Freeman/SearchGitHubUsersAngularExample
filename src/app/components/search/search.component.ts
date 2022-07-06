@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { EMPTY, ReplaySubject } from 'rxjs';
+import { EMPTY, ReplaySubject, Subject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
         filter, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.interface';
@@ -21,7 +21,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   private DEBOUNCE: number = 500;
   private USERS_PER_PAGE: number = 20;
   
-  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+  private destroyed$: Subject<boolean> = new Subject();
   private searchText: string = '';
 
   public searchInput = new FormControl();
@@ -67,32 +67,11 @@ export class SearchComponent implements OnInit, OnDestroy {
         catchError(err => this.onError())
       )
       .subscribe({
-        next: (res: ISearchUsersResponse) => {
-          this.users = res.items;
-          this.pageable.totalItemsCount = res.total_count;
-          this.error = res.items.length === 0;
-        },
+        next: (res: ISearchUsersResponse) => this.onSearch(res),
         error: err => this.onError()
       });
   }
   
-  public ngOnDestroy(): void {
-    this.destroyed$.next(true);
-    this.destroyed$.complete();
-  }
-
-  private clearUsers() {
-    this.users = [];
-    this.pageable.currentPage = 1;
-    this.pageable.totalItemsCount = 0;
-  }
-
-  private onError() {
-    this.clearUsers();
-    this.error = true;
-    return EMPTY;
-  }
-
   public loadMore() {
     this.pageable.currentPage++;
     
@@ -106,16 +85,40 @@ export class SearchComponent implements OnInit, OnDestroy {
       catchError(err => this.onError())
     )
     .subscribe({
-      next: (res: ISearchUsersResponse) => {
-        this.users.push(...res.items);
-        this.error = false;
-      },
+      next: (res: ISearchUsersResponse) => this.onLoadedMore(res),
       error: err => this.onError()
     });
   }
 
   public showLoadMoreBtn() {
-    return this.pageable.totalItemsCount !== 0 
-          && this.pageable.totalItemsCount > this.users.length;
+    return !this.error 
+            && this.pageable.totalItemsCount !== 0 
+            && !this.pageable.isLastPage;
+  }
+
+  private clearUsers() {
+    this.users = [];
+    this.pageable = new Pageable(this.USERS_PER_PAGE);
+  }
+
+  private onSearch(res: ISearchUsersResponse) {
+    this.users = res.items;
+    this.pageable = new Pageable(this.USERS_PER_PAGE, 1, res.total_count);
+  }
+
+  private onLoadedMore(res: ISearchUsersResponse) {
+    this.users.push(...res.items);
+    this.error = false;
+  }
+
+  private onError() {
+    this.clearUsers();
+    this.error = true;
+    return EMPTY;
+  }
+  
+  public ngOnDestroy(): void {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
   }
 }

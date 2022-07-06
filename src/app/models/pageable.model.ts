@@ -11,4 +11,12 @@ export class Pageable {
         this.currentPage = currentPage;
         this.totalItemsCount = totalItemsCount;
     }
+
+    public get totalPages() {
+        return Math.ceil(this.totalItemsCount / this.maxPerPage)
+    }
+
+    public get isLastPage() {
+        return this.currentPage === this.totalPages;
+    }
 }
