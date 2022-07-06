@@ -14,7 +14,7 @@ import { ReposComponent } from './components/repos/repos.component';
 import { UserItemComponent } from './components/user-item/user-item.component';
 import { LoaderComponent } from './components/loader/loader.component';
 import { LoadingService } from './services/loading.service';
-import { NetworkInterceptor } from './interceptors/network.interceptor';
+import { LoadingInterceptor } from './interceptors/loading.interceptor';
 
 
 @NgModule({
@@ -39,7 +39,7 @@ import { NetworkInterceptor } from './interceptors/network.interceptor';
     LoadingService,
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: NetworkInterceptor,
+      useClass: LoadingInterceptor,
       multi: true,
     },
   ],

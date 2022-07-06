@@ -76,6 +76,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     this.clearErrors();
 
+    this.loadingService.show();
+
     this.githubService.getUser(login).pipe(
       mergeMap(user => {
         this.user = user;
@@ -131,6 +133,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       error: (err: HttpErrorResponse) => this.onError()
     });
+
+    this.loadingService.hide();
   }
 
   private loadMoreFollowers(): void {
@@ -190,16 +194,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
   public loadMore(type: LoadMoreEnum): void {
     switch (type) {
       case LoadMoreEnum.FOLLOWERS:
+        this.loadingService.show();
         this.followersPageable.currentPage++;
         this.loadMoreFollowers();
+        this.loadingService.hide();
         break;
       case LoadMoreEnum.FOLLOWING:
+        this.loadingService.show();
         this.followingPageable.currentPage++;
         this.loadMoreFollowing();
+        this.loadingService.hide();
         break;
       case LoadMoreEnum.REPOS:
+        this.loadingService.show();
         this.reposPageable.currentPage++;
         this.loadMoreRepos();
+        this.loadingService.hide();
         break;
       default: break;
     }

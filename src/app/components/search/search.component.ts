@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { EMPTY, Subject } from 'rxjs';
+import { BehaviorSubject, EMPTY, Subject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
         filter, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.interface';
@@ -27,6 +27,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   public searchInput = new FormControl();
   public pageable!: Pageable;
+
+  // public users$: BehaviorSubject<IUser[]> = new BehaviorSubject<IUser[]>([]);
 
   public users: IUser[] = [];
   public error: boolean = false;
