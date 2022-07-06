@@ -50,4 +50,8 @@ describe('GitHubService', () => {
     const req = httpMock.expectOne(url, 'Call to API');
     expect(req.request.method).toBe('GET');
   })
+
+  afterEach(() => {
+    httpMock.verify();
+  });
 });
