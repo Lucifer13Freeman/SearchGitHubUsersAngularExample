@@ -106,7 +106,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       catchError(err => this.onError())
     )
     .subscribe({
-      next: res => {
+      next: (res: ISearchUsersResponse) => {
         this.users.push(...res.items);
         this.error = false;
       },
