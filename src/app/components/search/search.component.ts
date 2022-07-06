@@ -23,11 +23,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   private USERS_PER_PAGE: number = 20;
   
   private destroyed$: Subject<boolean> = new Subject();
-  private searchText: string = '';
+  public searchText: string = '';
 
   public searchInput = new FormControl();
   public pageable!: Pageable;
-  
+
+  // public users$: BehaviorSubject<IUser[]> = new BehaviorSubject<IUser[]>([]);
+
   public users: IUser[] = [];
   public error: boolean = false;
 
@@ -103,6 +105,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private onSearch(res: ISearchUsersResponse) {
+    this.error = res.total_count === 0;
     this.users = res.items;
     this.pageable = new Pageable(this.USERS_PER_PAGE, 1, res.total_count);
   }
