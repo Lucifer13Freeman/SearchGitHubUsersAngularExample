@@ -28,8 +28,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   public searchInput = new FormControl();
   public pageable!: Pageable;
 
-  // public users$: BehaviorSubject<IUser[]> = new BehaviorSubject<IUser[]>([]);
-
   public users: IUser[] = [];
   public error: boolean = false;
 
