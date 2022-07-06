@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { EMPTY, ReplaySubject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
         filter, map, switchMap, takeUntil } from 'rxjs/operators';
+import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.interface';
 import { IUser } from 'src/app/interfaces/user.interface';
 import { Pageable } from 'src/app/models/pageable.model';
 import { GithubService } from 'src/app/services/github.service';
@@ -50,9 +51,9 @@ export class SearchComponent implements OnInit, OnDestroy {
           }
           return text;
         }),
-        filter((searchText: string) => searchText !== ''),
         debounceTime(this.DEBOUNCE),
         distinctUntilChanged(),
+        filter((searchText: string) => searchText !== ''),
         switchMap((searchText: string) => { 
           this.searchText = searchText;
 
@@ -66,8 +67,8 @@ export class SearchComponent implements OnInit, OnDestroy {
         catchError(err => this.onError())
       )
       .subscribe({
-        next: res => {
-          this.users = res.items;
+        next: (res: ISearchUsersResponse) => {
+          this.users = [...res.items];
           this.pageable.totalItemsCount = res.total_count;
           this.error = res.items.length === 0;
         },
@@ -82,6 +83,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   private clearUsers() {
     this.users = [];
+    this.pageable.currentPage = 1;
     this.pageable.totalItemsCount = 0;
   }
 

@@ -1,5 +1,5 @@
 
-main {
+:host {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -10,7 +10,7 @@ main {
         transition-property: margin;
         transition-duration: .2s;
     }
-    @media screen and (min-width: 680) {
+    @media screen and (min-width: 680px) {
         padding: 60px 50px 60px 50px;
         transition-property: margin;
         transition-duration: .2s;
