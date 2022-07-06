@@ -211,17 +211,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
         return !this.errors.followers 
               && this.followersPageable.totalItemsCount !== 0 
               && !this.followersPageable.isLastPage; 
-              //this.followersPageable.totalItemsCount > this.followers.length;
       case LoadMoreEnum.FOLLOWING:
         return !this.errors.following 
               && this.followingPageable.totalItemsCount !== 0 
               && !this.followingPageable.isLastPage; 
-              //this.followingPageable.totalItemsCount > this.following.length;
       case LoadMoreEnum.REPOS:
         return !this.errors.repos 
               && this.reposPageable.totalItemsCount !== 0 
               && !this.reposPageable.isLastPage; 
-              //this.reposPageable.totalItemsCount > this.repos.length;
       default: 
         return false;
     }
