@@ -151,7 +151,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }))
     .subscribe({
       next: (followers: IUser[]) => this.followers = [...this.followers, ...followers],
-      error: (err: HttpErrorResponse) => this.onError()
+      error: (err: HttpErrorResponse) => this.onError(ErrorTypeEnum.FOLLOWERS)
     });
   }
 
@@ -169,7 +169,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }))
     .subscribe({
       next: (following: IUser[]) => this.following = [...this.following, ...following],
-      error: (err: HttpErrorResponse) => this.onError()
+      error: (err: HttpErrorResponse) => this.onError(ErrorTypeEnum.FOLLOWING)
     });
   }
 
@@ -187,7 +187,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }))
     .subscribe({
       next: (repos: IRepo[]) => this.repos = [...this.repos, ...repos],
-      error: (err: HttpErrorResponse) => this.onError()
+      error: (err: HttpErrorResponse) => this.onError(ErrorTypeEnum.REPOS)
     });
   }
 
