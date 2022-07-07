@@ -29,11 +29,6 @@
     flex-direction: column;
     padding: 10px;
 
-    .wrap {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-    }
     button {
       background: var(--red-color);
       color: var(--white-color);
@@ -60,6 +55,11 @@
         opacity: 0.8;
       }
     }
+  }
+  .wrap {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
   .loader {
     position: absolute;
