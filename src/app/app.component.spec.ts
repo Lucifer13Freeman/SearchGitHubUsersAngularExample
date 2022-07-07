@@ -2,11 +2,11 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { Router, Routes } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
-import { NotFoundComponent } from './components/dump/not-found/not-found.component';
 import { ProfileComponent } from './components/smart/profile/profile.component';
 import { SearchComponent } from './components/smart/search/search.component';
 import { Location } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NotFoundComponent } from './components/dumb/not-found/not-found.component';
 
 
 describe('AppComponent', () => {

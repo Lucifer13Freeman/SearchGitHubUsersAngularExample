@@ -1,6 +1,7 @@
 import { ISearchUsersResponse } from "src/app/interfaces/search-users-response.interface";
 
-export const searchOneUserText: string = "Lucifer13Freeman";
+export const findOneUserText: string = "Lucifer13Freeman";
+export const findNoOneUserText: string = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 export const searchOneUserMock: ISearchUsersResponse = {
     incomplete_results: false,
@@ -14,3 +15,8 @@ export const searchOneUserMock: ISearchUsersResponse = {
     total_count: 1
 }
 
+export const searchNoOneUserMock: ISearchUsersResponse = {
+  incomplete_results: false,
+  items: [],
+  total_count: 0
+}
