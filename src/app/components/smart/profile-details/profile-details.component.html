@@ -53,7 +53,8 @@
         ></app-error>
       </div>
     </div>
-    <app-loader *ngIf="model.loading$ | async"></app-loader>
+    <app-loader class="loader" *ngIf="model.loading$ | async"></app-loader>
+    
 </div>
 <ng-template #error>
     <app-error [text]="'User details did not load...'"></app-error>

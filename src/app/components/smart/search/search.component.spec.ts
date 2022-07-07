@@ -5,6 +5,7 @@ import { GithubService } from 'src/app/services/github.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { SearchComponent } from './search.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ErrorComponent } from '../../dumb/error/error.component';
 
 
 describe('SearchComponent', () => {
@@ -19,7 +20,8 @@ describe('SearchComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [ 
-        SearchComponent 
+        SearchComponent,
+        ErrorComponent
       ],
       providers: [
         GithubService,
