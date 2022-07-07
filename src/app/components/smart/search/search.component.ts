@@ -5,7 +5,6 @@ import { EMPTY, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
         filter, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.interface';
-import { IUserShort } from 'src/app/interfaces/user-short';
 import { Pageable } from 'src/app/models/pageable.model';
 import { GithubService } from 'src/app/services/github.service';
 import { LoadingService } from 'src/app/services/loading.service';
@@ -24,8 +23,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   private USERS_PER_PAGE: number = 20;
 
   public searchInput: FormControl = new FormControl();
-  
-  public searchRes$!: Observable<ISearchUsersResponse>;
   private destroyed$: Subject<boolean> = new Subject<boolean>();
   
   public model$!: Observable<ISearchModel>;
