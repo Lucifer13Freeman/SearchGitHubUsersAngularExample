@@ -19,7 +19,7 @@ import { ISearchModel } from './search-model.interface';
 })
 export class SearchComponent implements OnInit, OnDestroy {
 
-  private DEBOUNCE: number = 500;
+  private DEBOUNCE: number = 750;
   private USERS_PER_PAGE: number = 20;
 
   public searchInput: FormControl = new FormControl();
