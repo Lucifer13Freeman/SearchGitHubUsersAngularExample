@@ -109,7 +109,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   private onError() {
     this.clearUsers();
-    this.error = true;
+    this.error = this.searchText !== '';
     return EMPTY;
   }
   
