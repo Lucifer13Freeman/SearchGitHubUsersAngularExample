@@ -1,0 +1,92 @@
+<div *ngIf="user">
+  <div class="github-card profile-card">
+    <div class="header User"></div>
+    <a class="avatar" [href]="baseUrl + user.login" target="_blank">
+      <img [src]="user.avatar_url + '&s=80'" [alt]="user.name" />
+    </a>
+    <div class="content">
+      <h1>{{ user.name }}</h1>
+      <ul class="status">
+        <li>
+          <a
+            [href]="baseUrl + user.login + '?tab=repositories'"
+            target="_blank"
+          >
+            <strong>{{ user.public_repos }}</strong
+            >Repos
+          </a>
+        </li>
+        <li>
+          <a [href]="baseUrl + user.login + '?tab=following'" target="_blank">
+            <strong>{{ user.following }}</strong
+            >Following
+          </a>
+        </li>
+        <li>
+          <a [href]="baseUrl + user.login + '?tab=followers'" target="_blank">
+            <strong>{{ user.followers }}</strong
+            >Followers
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <section>
+    <div>
+      <h3>Repos</h3>
+      <div class="container">
+        <app-repos [repos]="repos"></app-repos>
+        <button
+          *ngIf="showLoadMoreBtn(reposLoading)"
+          (click)="loadMore(reposLoading)"
+        >
+          Load More
+        </button>
+        <app-error
+          *ngIf="errors.repos"
+          text="Repos did not load..."
+        ></app-error>
+      </div>
+    </div>
+    <div>
+      <h3>Following</h3>
+      <div class="container wrap">
+        <app-user-item
+          *ngFor="let user of following"
+          [user]="user"
+        ></app-user-item>
+        <button
+          *ngIf="showLoadMoreBtn(followingLoading)"
+          (click)="loadMore(followingLoading)"
+        >
+          Load More
+        </button>
+        <app-error
+          *ngIf="errors.following"
+          text="Following did not load..."
+        ></app-error>
+      </div>
+    </div>
+    <div>
+      <h3>Followers</h3>
+      <div class="container wrap">
+        <app-user-item
+          *ngFor="let user of followers"
+          [user]="user"
+        ></app-user-item>
+        <button
+          *ngIf="showLoadMoreBtn(followersLoading)"
+          (click)="loadMore(followersLoading)"
+        >
+          Load More
+        </button>
+        <app-error
+          *ngIf="errors.followers"
+          text="Followers did not load..."
+        ></app-error>
+      </div>
+    </div>
+  </section>
+  <app-loader *ngIf="loading$ | async"></app-loader>
+</div>
+<app-error *ngIf="errors.user" text="User did not load..."></app-error>
