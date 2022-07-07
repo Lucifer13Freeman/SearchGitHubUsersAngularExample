@@ -5,10 +5,10 @@ import { EMPTY, Observable, Subject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
         filter, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.interface';
-import { IUserShort } from 'src/app/interfaces/user-short';
 import { Pageable } from 'src/app/models/pageable.model';
 import { GithubService } from 'src/app/services/github.service';
 import { LoadingService } from 'src/app/services/loading.service';
+import { ISearchModel } from './search.model';
 
 
 @Component({
@@ -21,53 +21,58 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   private DEBOUNCE: number = 500;
   private USERS_PER_PAGE: number = 20;
-  
-  private destroyed$: Subject<boolean> = new Subject();
-  public searchText: string = '';
 
-  public searchInput = new FormControl();
-  public pageable!: Pageable;
-  
-  public users: IUserShort[] = [];
-  public error: boolean = false;
-
-  public loading$ = this.loadingService.getLoading();
+  public model!: ISearchModel;
 
   constructor(private readonly githubService: GithubService,
               private loadingService: LoadingService) { }
 
   public ngOnInit(): void { 
-    this.pageable = new Pageable(this.USERS_PER_PAGE);
+    this.modelInit();
     this.searchUsers();
   }
 
-  public searchUsers() {
-    this.searchInput.valueChanges
-      .pipe(
-        map((searchText: string) => {
-          this.searchText = searchText.trim();
+  private modelInit(): void {
+    this.model.users = [];
+    this.model.searchRes$ = this.getSearchResponse$();
+    this.model.loading$ = this.loadingService.getLoading();
+    this.model.pageable = new Pageable(this.USERS_PER_PAGE);
+    this.model.error = false;
+    this.model.searchText = '';
+    this.model.searchInput = new FormControl();
+    this.model.destroyed$ = new Subject();
+  }
 
-          if (this.searchText === '') {
-            this.clearUsers();
-            this.error = false;
-          }
-          return this.searchText;
-        }),
-        debounceTime(this.DEBOUNCE),
-        distinctUntilChanged(),
-        filter((searchText: string) => searchText !== ''),
-        switchMap((searchText: string) => this.search()),
-        takeUntil(this.destroyed$),
-        catchError((err: HttpErrorResponse) => this.onError())
-      )
-      .subscribe({
-        next: (res: ISearchUsersResponse) => this.onSearch(res),
-        error: (err: HttpErrorResponse) => this.onError()
-      });
+  public getSearchResponse$(): Observable<ISearchUsersResponse> {
+    return this.model.searchInput.valueChanges
+    .pipe(
+      map((searchText: string) => {
+        this.model.searchText = searchText.trim();
+
+        if (this.model.searchText === '') {
+          this.clearUsers();
+          this.model.error = false;
+        }
+        return this.model.searchText;
+      }),
+      debounceTime(this.DEBOUNCE),
+      distinctUntilChanged(),
+      filter((searchText: string) => searchText !== ''),
+      switchMap((searchText: string) => this.search()),
+      takeUntil(this.model.destroyed$),
+      catchError((err: HttpErrorResponse) => this.onError())
+    );
+  }
+
+  private searchUsers() {
+    this.model.searchRes$.subscribe({
+      next: (res: ISearchUsersResponse) => this.onSearch(res),
+      error: (err: HttpErrorResponse) => this.onError()
+    });
   }
 
   public loadMore() {
-    this.pageable.currentPage++;
+    this.model.pageable.currentPage++;
     this.search().subscribe({
       next: (res: ISearchUsersResponse) => this.onLoadedMore(res),
       error: (err: HttpErrorResponse) => this.onError()
@@ -75,46 +80,46 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   public showLoadMoreBtn() {
-    return !this.error 
-            && this.pageable.totalItemsCount !== 0 
-            && !this.pageable.isLastPage;
+    return !this.model.error 
+            && this.model.pageable.totalItemsCount !== 0 
+            && !this.model.pageable.isLastPage;
   }
 
   private search(): Observable<ISearchUsersResponse> {
     return this.githubService.searchUsers({ 
-      login: this.searchText, 
-      page: this.pageable.currentPage,
-      perPage: this.pageable.maxPerPage 
+      login: this.model.searchText, 
+      page: this.model.pageable.currentPage,
+      perPage: this.model.pageable.maxPerPage 
     }).pipe(
-      takeUntil(this.destroyed$),
+      takeUntil(this.model.destroyed$),
       catchError((err: HttpErrorResponse) => this.onError())
     );
   }
 
   private clearUsers() {
-    this.users = [];
-    this.pageable = new Pageable(this.USERS_PER_PAGE);
+    this.model.users = [];
+    this.model.pageable = new Pageable(this.USERS_PER_PAGE);
   }
 
   private onSearch(res: ISearchUsersResponse) {
-    this.error = res.total_count === 0 && this.searchText !== '';
-    this.users = res.items;
-    this.pageable = new Pageable(this.USERS_PER_PAGE, 1, res.total_count);
+    this.model.error = res.total_count === 0 && this.model.searchText !== '';
+    this.model.users = res.items;
+    this.model.pageable = new Pageable(this.USERS_PER_PAGE, 1, res.total_count);
   }
 
   private onLoadedMore(res: ISearchUsersResponse) {
-    this.users.push(...res.items);
-    this.error = false;
+    this.model.users.push(...res.items);
+    this.model.error = false;
   }
 
   private onError() {
     this.clearUsers();
-    this.error = this.searchText !== '';
+    this.model.error = this.model.searchText !== '';
     return EMPTY;
   }
   
   public ngOnDestroy(): void {
-    this.destroyed$.next(true);
-    this.destroyed$.complete();
+    this.model.destroyed$.next(true);
+    this.model.destroyed$.complete();
   }
 }
