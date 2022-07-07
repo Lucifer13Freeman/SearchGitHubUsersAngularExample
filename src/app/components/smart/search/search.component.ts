@@ -46,7 +46,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       pageable: new Pageable(this.USERS_PER_PAGE),
       error: false,
       searchText: '',
-      searchInput: new FormControl()
     }
 
     this.model$ = of(model).pipe(map((model: ISearchModel) => this.model = model));

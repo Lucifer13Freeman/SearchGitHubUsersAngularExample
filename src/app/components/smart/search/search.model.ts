@@ -10,7 +10,7 @@ export interface ISearchModel {
     pageable: Pageable;
     error: boolean;
     loading$: Observable<boolean>;
-    searchInput: FormControl;
+    // searchInput: FormControl;
     searchText: string;
     // destroyed$: Subject<boolean>;
 }
