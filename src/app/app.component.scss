@@ -1,0 +1,26 @@
+
+:host {
+    display: block;
+}
+
+nav {
+    a {
+        font-size: 2rem;
+        margin: 0 .6rem;
+        color: var(--light-color);
+        text-decoration: none;
+
+        &:hover {
+            color: #666;
+        }
+    }
+}
+
+header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    background-color: var(--red-tr-color);
+    z-index: 10;
+}
