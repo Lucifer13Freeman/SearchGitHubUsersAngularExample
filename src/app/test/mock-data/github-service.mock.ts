@@ -13,3 +13,4 @@ export const searchOneUserMock: ISearchUsersResponse = {
     }],
     total_count: 1
 }
+

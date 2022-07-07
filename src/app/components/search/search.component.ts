@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { EMPTY, Subject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
@@ -46,9 +46,11 @@ export class SearchComponent implements OnInit, OnDestroy {
       .pipe(
         map((searchText: string) => {
           const text = searchText.trim();
+
           if (text === '') {
             this.clearUsers();
             this.error = false;
+            this.searchText = text;
           }
           return text;
         }),
@@ -62,7 +64,10 @@ export class SearchComponent implements OnInit, OnDestroy {
             login: searchText, 
             page: this.pageable.currentPage,
             perPage: this.pageable.maxPerPage 
-          });
+          }).pipe(
+            takeUntil(this.destroyed$),
+            catchError((err: HttpErrorResponse) => this.onError())
+          );
         }),
         takeUntil(this.destroyed$),
         catchError((err: HttpErrorResponse) => this.onError())
@@ -72,7 +77,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         error: (err: HttpErrorResponse) => this.onError()
       });
   }
-  
+
   public loadMore() {
     this.pageable.currentPage++;
     
@@ -80,12 +85,10 @@ export class SearchComponent implements OnInit, OnDestroy {
       login: this.searchText, 
       page: this.pageable.currentPage,
       perPage: this.pageable.maxPerPage 
-    })
-    .pipe(
+    }).pipe(
       takeUntil(this.destroyed$),
       catchError((err: HttpErrorResponse) => this.onError())
-    )
-    .subscribe({
+    ).subscribe({
       next: (res: ISearchUsersResponse) => this.onLoadedMore(res),
       error: (err: HttpErrorResponse) => this.onError()
     });
@@ -103,7 +106,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private onSearch(res: ISearchUsersResponse) {
-    this.error = res.total_count === 0;
+    this.error = res.total_count === 0 && this.searchText !== '';
     this.users = res.items;
     this.pageable = new Pageable(this.USERS_PER_PAGE, 1, res.total_count);
   }
