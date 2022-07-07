@@ -1,4 +1,4 @@
-<!-- <div *ngIf="model"> -->
+<div *ngIf="model$ | async as model; else error">
   <form class="container">
     <div class="container__search">
       <h2>Search GitHub Users</h2>
@@ -8,17 +8,17 @@
         [formControl]="searchInput"
         placeholder="Username..."
       />
-      <p *ngIf="pageable.totalItemsCount !== 0">
-        Users found: {{ pageable.totalItemsCount }}
+      <p *ngIf="model.pageable.totalItemsCount !== 0">
+        Users found: {{ model.pageable.totalItemsCount }}
       </p>
     </div>
   </form>
 
   <div class="wrap">
-    <app-user-item *ngFor="let user of users" [user]="user"></app-user-item>
+    <app-user-item *ngFor="let user of model.users" [user]="user"></app-user-item>
   </div>
 
-  <app-loader *ngIf="loading$ | async"></app-loader>
+  <app-loader *ngIf="model.loading$ | async"></app-loader>
 
   <button
     *ngIf="showLoadMoreBtn()"
@@ -28,5 +28,9 @@
     Load More
   </button>
 
-  <app-error *ngIf="error" [text]="'Users Not Found...'"></app-error>
-<!-- </div> -->
+  <app-error *ngIf="model.error" [text]="'Users Not Found...'"></app-error>
+</div>
+
+<ng-template #error>
+  <app-error [text]="''"></app-error>
+</ng-template>

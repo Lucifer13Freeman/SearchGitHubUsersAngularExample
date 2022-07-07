@@ -6,11 +6,11 @@ import { Pageable } from "src/app/models/pageable.model";
 
 export interface ISearchModel {
     users: IUserShort[];
-    searchRes$: Observable<ISearchUsersResponse>;
+    // searchRes$: Observable<ISearchUsersResponse>;
     pageable: Pageable;
     error: boolean;
     loading$: Observable<boolean>;
     searchInput: FormControl;
     searchText: string;
-    destroyed$: Subject<boolean>;
+    // destroyed$: Subject<boolean>;
 }
