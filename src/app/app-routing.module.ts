@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NotFoundComponent } from './components/not-found/not-found.component';
-import { ProfileComponent } from './components/profile/profile.component';
-import { SearchComponent } from './components/search/search.component';
+import { NotFoundComponent } from './components/dumb/not-found/not-found.component';
+import { ProfileComponent } from './components/smart/profile/profile.component';
+import { SearchComponent } from './components/smart/search/search.component';
 
 
 const routes: Routes = [
