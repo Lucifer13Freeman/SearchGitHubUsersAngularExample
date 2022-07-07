@@ -45,22 +45,18 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.searchInput.valueChanges
       .pipe(
         map((searchText: string) => {
-          const text = searchText.trim();
+          this.searchText = searchText.trim();
 
-          if (text === '') {
+          if (this.searchText === '') {
             this.clearUsers();
             this.error = false;
-            this.searchText = text;
           }
-          return text;
+          return this.searchText;
         }),
         debounceTime(this.DEBOUNCE),
         distinctUntilChanged(),
         filter((searchText: string) => searchText !== ''),
-        switchMap((searchText: string) => { 
-          this.searchText = searchText;
-          return this.search();
-        }),
+        switchMap((searchText: string) => this.search()),
         takeUntil(this.destroyed$),
         catchError((err: HttpErrorResponse) => this.onError())
       )
