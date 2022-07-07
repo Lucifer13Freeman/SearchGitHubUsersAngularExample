@@ -1,41 +1,50 @@
-<div *ngIf="user">
-  <div class="github-card profile-card">
-    <div class="header User"></div>
-    <a class="avatar" [href]="baseUrl + user.login" target="_blank">
-      <img [src]="user.avatar_url + '&s=80'" [alt]="user.name" />
+<div *ngIf="model$ | async as model">
+  <app-error *ngIf="errors.user" text="User did not load..."></app-error>
+
+  <div *ngIf="!errors.user" class="github-card profile-card">
+    <div class="header user"></div>
+    <a class="avatar" [href]="baseUrl + model.user.login" target="_blank">
+      <img [src]="model.user.avatar_url + '&s=80'" [alt]="model.user.login" />
     </a>
     <div class="content">
-      <h1>{{ user.name }}</h1>
+      <h1>{{ model.user.name }}</h1>
       <ul class="status">
         <li>
           <a
-            [href]="baseUrl + user.login + '?tab=repositories'"
+            [href]="baseUrl + model.user.login + '?tab=repositories'"
             target="_blank"
           >
-            <strong>{{ user.public_repos }}</strong
+            <strong>{{ model.user.public_repos }}</strong
             >Repos
           </a>
         </li>
         <li>
-          <a [href]="baseUrl + user.login + '?tab=following'" target="_blank">
-            <strong>{{ user.following }}</strong
+          <a
+            [href]="baseUrl + model.user.login + '?tab=following'"
+            target="_blank"
+          >
+            <strong>{{ model.user.following }}</strong
             >Following
           </a>
         </li>
         <li>
-          <a [href]="baseUrl + user.login + '?tab=followers'" target="_blank">
-            <strong>{{ user.followers }}</strong
+          <a
+            [href]="baseUrl + model.user.login + '?tab=followers'"
+            target="_blank"
+          >
+            <strong>{{ model.user.followers }}</strong
             >Followers
           </a>
         </li>
       </ul>
     </div>
   </div>
-  <section>
+
+  <section *ngIf="!errors.user">
     <div>
       <h3>Repos</h3>
       <div class="container">
-        <app-repos [repos]="repos"></app-repos>
+        <app-repos [repos]="model.repos"></app-repos>
         <button
           *ngIf="showLoadMoreBtn(reposLoading)"
           (click)="loadMore(reposLoading)"
@@ -52,7 +61,7 @@
       <h3>Following</h3>
       <div class="container wrap">
         <app-user-item
-          *ngFor="let user of following"
+          *ngFor="let user of model.following"
           [user]="user"
         ></app-user-item>
         <button
@@ -71,7 +80,7 @@
       <h3>Followers</h3>
       <div class="container wrap">
         <app-user-item
-          *ngFor="let user of followers"
+          *ngFor="let user of model.followers"
           [user]="user"
         ></app-user-item>
         <button
@@ -87,6 +96,5 @@
       </div>
     </div>
   </section>
-  <app-loader *ngIf="loading$ | async"></app-loader>
+  <app-loader *ngIf="model.loading$ | async"></app-loader>
 </div>
-<app-error *ngIf="errors.user" text="User did not load..."></app-error>

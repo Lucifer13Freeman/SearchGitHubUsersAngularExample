@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, 
         Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { catchError, EMPTY, forkJoin, mergeMap, Observable, 
+import { ActivatedRoute, Params } from '@angular/router';
+import { catchError, EMPTY, forkJoin, map, Observable, 
         of, Subject, takeUntil } from 'rxjs';
 import { ErrorTypeEnum } from 'src/app/enums/error-type.enum';
 import { LoadMoreEnum } from 'src/app/enums/load-more.enum';
@@ -12,6 +12,8 @@ import { Pageable } from 'src/app/models/pageable.model';
 import { GithubService } from 'src/app/services/github.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { environment } from 'src/environments/environment';
+import { IProfileErrors } from './profile-errors.interface';
+import { IProfileModel } from './interfaces/profile-model.interface';
 
 
 @Component({
@@ -26,122 +28,124 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private FOLLOWING_PER_PAGE = 10;
   private REPOS_PER_PAGE = 10;
 
-  public user!: IUser;
-  public errors = {
-    user: false,
-    followers: false,
-    following: false,
-    repos: false
-  }
+  public errors: IProfileErrors = this.initialErrors();
 
   public followersLoading: LoadMoreEnum = LoadMoreEnum.FOLLOWERS;
   public followingLoading: LoadMoreEnum = LoadMoreEnum.FOLLOWING;
   public reposLoading: LoadMoreEnum = LoadMoreEnum.REPOS;
 
-  public followers: IUser[] = [];
-  public repos: IRepo[] = [];
-  public following: IUser[] = [];
-
-  public followersPageable!: Pageable;
-  public reposPageable!: Pageable;
-  public followingPageable!: Pageable;
-
   public baseUrl: string = environment.BASE_URL;
 
   private destroyed$: Subject<boolean> = new Subject();
-  public loading$ = this.loadingService.getLoading();
 
+  public model$!: Observable<IProfileModel>;
+  public model!: IProfileModel;
   
   constructor(private route: ActivatedRoute,
               private readonly changeDetector: ChangeDetectorRef,
               private readonly githubService: GithubService,
               private loadingService: LoadingService) { }
 
-  public ngOnInit(): void { 
-    this.route.params.subscribe(params => {
-      const login = params['login'];
-      this.getProfile(login);
+  public ngOnInit(): void {
+    this.modelInit();
+  }
+
+  private modelInit(): void {
+
+    this.route.params.subscribe({
+      next: (params: Params) => {
+        this.getUserData$(params['login'])
+          .subscribe({
+            next: (res: [IUser | never[],
+                        IUser[] | never[], 
+                        IRepo[] | never[], 
+                        IUser[] | never[]]) => {
+
+            const user = {...res[0]} as IUser;
+            const followers = [...res[1]] as IUser[];
+            const repos = [...res[2]] as IRepo[];
+            const following = [...res[3]] as IUser[];
+
+            const model: IProfileModel = {
+              user,
+              followers,
+              repos,
+              following,
+
+              followersPageable: new Pageable(
+                this.FOLLOWERS_PER_PAGE, 1, user.followers
+              ),
+              followingPageable: new Pageable(
+                this.FOLLOWING_PER_PAGE, 1, user.following
+              ),
+              reposPageable: new Pageable(
+                this.REPOS_PER_PAGE, 1, user.public_repos
+              ),
+
+              errors: {...this.initialErrors()},
+
+              loading$: this.loadingService.getLoading()
+            }
+
+            this.model$ = of(model).pipe(map((model: IProfileModel) => this.model = model));
+            
+            this.changeDetector.detectChanges();
+          },
+          error: (err: HttpErrorResponse) => this.onError(ErrorTypeEnum.USER)
+        })
+      }
     });
 
-    this.initPageables();
+    
   }
 
-  private initPageables(): void {
-    this.followersPageable = new Pageable(this.FOLLOWERS_PER_PAGE);
-    this.followingPageable = new Pageable(this.FOLLOWING_PER_PAGE);
-    this.reposPageable = new Pageable(this.REPOS_PER_PAGE);
-  }
+  private getUserData$(login: string): Observable<[IUser | never[], 
+                                                  never[] | IUser[], 
+                                                  never[] | IRepo[], 
+                                                  never[] | IUser[]]> {
 
-  private getProfile(login: string): void {
-
-    this.clearErrors();
-
-    this.loadingService.show();
-
-    this.githubService.getUser(login).pipe(
-      mergeMap(user => {
-        this.user = user;
-
-        this.followersPageable.totalItemsCount = user.followers;
-        this.followingPageable.totalItemsCount = user.following;
-        this.reposPageable.totalItemsCount = user.public_repos;
-
-        const followers = this.githubService.getFollowersByUser({ 
-          login, 
-          page: this.followersPageable.currentPage,
-          perPage: this.followersPageable.maxPerPage 
-        }).pipe(catchError((err: HttpErrorResponse) => {
-          this.onError(ErrorTypeEnum.FOLLOWERS); 
-          return of([]);
-        }));
-
-        const repos = this.githubService.getReposByUser({ 
-          login, 
-          page: this.reposPageable.currentPage,
-          perPage: this.reposPageable.maxPerPage 
-        }).pipe(catchError((err: HttpErrorResponse) => {
-          this.onError(ErrorTypeEnum.REPOS); 
-          return of([]);
-        }));
-
-        const following = this.githubService.getFollowingByUser({ 
-          login, 
-          page: this.followingPageable.currentPage,
-          perPage: this.followingPageable.maxPerPage 
-        }).pipe(catchError((err: HttpErrorResponse) => {
-          this.onError(ErrorTypeEnum.FOLLOWING); 
-          return of([]);
-        }));
-
-        return forkJoin([ followers, repos, following ]);
-      }),
-      catchError(() => {
+    const user = this.githubService.getUser(login)
+      .pipe(catchError((err: HttpErrorResponse) => {
         this.onError(ErrorTypeEnum.USER); 
         return of([]);
-      }),
-      takeUntil(this.destroyed$),
-    )
-    .subscribe({
-      next: (res: never[] | [IUser[] | never[], 
-                              IRepo[] | never[], 
-                              IUser[] | never[]]) => {
-        this.followers = res[0];
-        this.repos = res[1];
-        this.following = res[2];
+    }));
 
-        this.changeDetector.detectChanges();
-      },
-      error: (err: HttpErrorResponse) => this.onError()
-    });
+    const followers = this.githubService.getFollowersByUser({ 
+      login, 
+      page: 1,
+      perPage: this.FOLLOWERS_PER_PAGE 
+    }).pipe(catchError((err: HttpErrorResponse) => {
+      this.onError(ErrorTypeEnum.FOLLOWERS); 
+      return of([]);
+    }));
 
-    this.loadingService.hide();
+    const repos = this.githubService.getReposByUser({ 
+      login, 
+      page: 1,
+      perPage: this.REPOS_PER_PAGE 
+    }).pipe(catchError((err: HttpErrorResponse) => {
+      this.onError(ErrorTypeEnum.REPOS); 
+      return of([]);
+    }));
+
+    const following = this.githubService.getFollowingByUser({ 
+      login, 
+      page: 1,
+      perPage: this.FOLLOWING_PER_PAGE 
+    }).pipe(catchError((err: HttpErrorResponse) => {
+      this.onError(ErrorTypeEnum.FOLLOWING); 
+      return of([]);
+    }));
+
+    const getUserDataRes$ = forkJoin([ user, followers, repos, following ]);
+    return getUserDataRes$;
   }
 
   private loadMoreFollowers(): void {
     this.githubService.getFollowersByUser({ 
-      login: this.user.login, 
-      page: this.followersPageable.currentPage,
-      perPage: this.followersPageable.maxPerPage 
+      login: this.model.user.login, 
+      page: this.model.followersPageable.currentPage,
+      perPage: this.model.followersPageable.maxPerPage 
     })
     .pipe(
       takeUntil(this.destroyed$),
@@ -150,16 +154,18 @@ export class ProfileComponent implements OnInit, OnDestroy {
         return of([]);
     }))
     .subscribe({
-      next: (followers: IUser[]) => this.followers = [...this.followers, ...followers],
+      next: (followers: IUser[]) => this.model.followers = [
+        ...this.model.followers, ...followers
+      ],
       error: (err: HttpErrorResponse) => this.onError(ErrorTypeEnum.FOLLOWERS)
     });
   }
 
   private loadMoreFollowing(): void {
     this.githubService.getFollowingByUser({ 
-      login: this.user.login, 
-      page: this.followingPageable.currentPage,
-      perPage: this.followingPageable.maxPerPage 
+      login: this.model.user.login, 
+      page: this.model.followingPageable.currentPage,
+      perPage: this.model.followingPageable.maxPerPage 
     })
     .pipe(
       takeUntil(this.destroyed$),
@@ -168,16 +174,18 @@ export class ProfileComponent implements OnInit, OnDestroy {
         return of([]);
     }))
     .subscribe({
-      next: (following: IUser[]) => this.following = [...this.following, ...following],
+      next: (following: IUser[]) => this.model.following = [
+        ...this.model.following, ...following
+      ],
       error: (err: HttpErrorResponse) => this.onError(ErrorTypeEnum.FOLLOWING)
     });
   }
 
   private loadMoreRepos(): void {
     this.githubService.getReposByUser({ 
-      login: this.user.login, 
-      page: this.reposPageable.currentPage,
-      perPage: this.reposPageable.maxPerPage 
+      login: this.model.user.login, 
+      page: this.model.reposPageable.currentPage,
+      perPage: this.model.reposPageable.maxPerPage 
     })
     .pipe(
       takeUntil(this.destroyed$),
@@ -186,7 +194,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
         return of([]);
     }))
     .subscribe({
-      next: (repos: IRepo[]) => this.repos = [...this.repos, ...repos],
+      next: (repos: IRepo[]) => this.model.repos = [
+        ...this.model.repos, ...repos
+      ],
       error: (err: HttpErrorResponse) => this.onError(ErrorTypeEnum.REPOS)
     });
   }
@@ -194,22 +204,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
   public loadMore(type: LoadMoreEnum): void {
     switch (type) {
       case LoadMoreEnum.FOLLOWERS:
-        this.loadingService.show();
-        this.followersPageable.currentPage++;
+        this.model.followersPageable.currentPage++;
         this.loadMoreFollowers();
-        this.loadingService.hide();
         break;
       case LoadMoreEnum.FOLLOWING:
-        this.loadingService.show();
-        this.followingPageable.currentPage++;
+        this.model.followingPageable.currentPage++;
         this.loadMoreFollowing();
-        this.loadingService.hide();
         break;
       case LoadMoreEnum.REPOS:
-        this.loadingService.show();
-        this.reposPageable.currentPage++;
+        this.model.reposPageable.currentPage++;
         this.loadMoreRepos();
-        this.loadingService.hide();
         break;
       default: break;
     }
@@ -219,16 +223,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
     switch (type) {
       case LoadMoreEnum.FOLLOWERS:
         return !this.errors.followers 
-              && this.followersPageable.totalItemsCount !== 0 
-              && !this.followersPageable.isLastPage; 
+              && this.model.followersPageable.totalItemsCount !== 0 
+              && !this.model.followersPageable.isLastPage; 
       case LoadMoreEnum.FOLLOWING:
         return !this.errors.following 
-              && this.followingPageable.totalItemsCount !== 0 
-              && !this.followingPageable.isLastPage; 
+              && this.model.followingPageable.totalItemsCount !== 0 
+              && !this.model.followingPageable.isLastPage; 
       case LoadMoreEnum.REPOS:
         return !this.errors.repos 
-              && this.reposPageable.totalItemsCount !== 0 
-              && !this.reposPageable.isLastPage; 
+              && this.model.reposPageable.totalItemsCount !== 0 
+              && !this.model.reposPageable.isLastPage; 
       default: 
         return false;
     }
@@ -240,27 +244,34 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   private clearFollowers(): void {
-    this.followers = [];
-    this.followersPageable = new Pageable(this.FOLLOWERS_PER_PAGE);
+    if (this.model) {
+      this.model.followers = [];
+      this.model.followersPageable = new Pageable(this.FOLLOWERS_PER_PAGE);
+    }
   }
 
   private clearFollowing(): void {
-    this.following = [];
-    this.followingPageable = new Pageable(this.FOLLOWING_PER_PAGE);
+    if (this.model) {
+      this.model.following = [];
+      this.model.followingPageable = new Pageable(this.FOLLOWING_PER_PAGE);
+    }
   }
 
   private clearRepos(): void { 
-    this.repos = [];
-    this.reposPageable = new Pageable(this.REPOS_PER_PAGE);
+    if (this.model) {
+      this.model.repos = [];
+      this.model.reposPageable = new Pageable(this.REPOS_PER_PAGE);
+    }
   }
 
-  private clearErrors(): void {
-    this.errors = {
+  private initialErrors(): IProfileErrors {
+    const errors = {
       user: false,
       followers: false,
       following: false,
       repos: false
     }
+    return errors;
   }
 
   private onError(type: ErrorTypeEnum = ErrorTypeEnum.USER): Observable<never> {
@@ -282,7 +293,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.clearRepos();
         break;
     }
-
     return EMPTY;
   }
 }

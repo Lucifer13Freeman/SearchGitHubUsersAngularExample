@@ -22,10 +22,12 @@ p {
     padding: .4rem 1rem;
     border: 1px solid var(--light-color);
     margin-bottom: .5rem;
+    border-radius: 10px;
 
     a {
         color: var(--dark-color);
         text-decoration: none;
+        padding-left: 10px;
 
         &:hover {
             color: #666;

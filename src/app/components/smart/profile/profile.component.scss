@@ -28,8 +28,8 @@
         position: relative;
         padding: 0;
         margin: 0;
-        height: 148px;
-        border-radius: 4px 4px 0 0;
+        height: 10rem;
+        border-radius: 10px 10px 0 0;
         background-size: cover;
         background-position: center;
         background-color: #000;
@@ -136,11 +136,12 @@ section {
 
     .container {
         max-height: 400px;
+        max-width: 1fr;
         overflow-y: auto;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
-    }
+    
     .wrap {
         display: flex;
         flex-direction: row;
@@ -158,9 +159,10 @@ section {
         cursor: pointer;
         transition: opacity 0.2s;
         outline: none;
-        position: absolute;
+        position: relative;
         bottom: 0;
         max-width: 16rem;
+        max-height: 3rem;
 
         &:disabled {
             background: var(--dark-color);
@@ -170,6 +172,7 @@ section {
         &:hover:not(:disabled) {
             opacity: .8;
         }
+    }
     }
 
     @media screen and (max-width: 800px) {

@@ -1,8 +1,7 @@
 
-<ul *ngIf="repos.length; else noRepos">
+<ul *ngIf="repos.length">
     <li class="repo" *ngFor="let repo of repos; let i = index">
         <strong>{{i + 1}}.</strong>
         <a [href]="repo.html_url">{{repo.full_name}}</a>
     </li>
 </ul>
-<ng-template #noRepos><p>No repos yet...</p></ng-template>

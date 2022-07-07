@@ -8,7 +8,7 @@ import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.i
 import { Pageable } from 'src/app/models/pageable.model';
 import { GithubService } from 'src/app/services/github.service';
 import { LoadingService } from 'src/app/services/loading.service';
-import { ISearchModel } from './search.model';
+import { ISearchModel } from './search-model.interface';
 
 
 @Component({
@@ -36,7 +36,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.searchUsers();
   }
 
-  public modelInit(): void {
+  private modelInit(): void {
     const model: ISearchModel = {
       loading$: this.loadingService.getLoading(),
       users: [],

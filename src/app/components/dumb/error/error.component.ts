@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 export class ErrorComponent implements OnInit {
 
   @Input()
-  public text: string = 'Not found';
+  public text: string = '';
 
   constructor() { }
 

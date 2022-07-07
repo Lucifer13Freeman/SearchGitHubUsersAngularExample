@@ -1,9 +1,7 @@
 <div *ngIf="model$ | async; else error">
-  <form class="container">
-    <div class="container__search">
+  <form>
       <h2>Search GitHub Users</h2>
       <input
-        class="search"
         type="search"
         [formControl]="searchInput"
         placeholder="Username..."
@@ -11,7 +9,6 @@
       <p *ngIf="model.pageable.totalItemsCount !== 0">
         Users found: {{ model.pageable.totalItemsCount }}
       </p>
-    </div>
   </form>
 
   <div class="wrap">
@@ -32,5 +29,5 @@
 </div>
 
 <ng-template #error>
-  <app-error [text]="''"></app-error>
+  <app-error></app-error>
 </ng-template>
