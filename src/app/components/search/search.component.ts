@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { EMPTY, Subject } from 'rxjs';
+import { EMPTY, Observable, Subject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, 
         filter, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.interface';
@@ -59,15 +59,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         filter((searchText: string) => searchText !== ''),
         switchMap((searchText: string) => { 
           this.searchText = searchText;
-
-          return this.githubService.searchUsers({ 
-            login: searchText, 
-            page: this.pageable.currentPage,
-            perPage: this.pageable.maxPerPage 
-          }).pipe(
-            takeUntil(this.destroyed$),
-            catchError((err: HttpErrorResponse) => this.onError())
-          );
+          return this.search();
         }),
         takeUntil(this.destroyed$),
         catchError((err: HttpErrorResponse) => this.onError())
@@ -80,15 +72,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   public loadMore() {
     this.pageable.currentPage++;
-    
-    this.githubService.searchUsers({ 
-      login: this.searchText, 
-      page: this.pageable.currentPage,
-      perPage: this.pageable.maxPerPage 
-    }).pipe(
-      takeUntil(this.destroyed$),
-      catchError((err: HttpErrorResponse) => this.onError())
-    ).subscribe({
+    this.search().subscribe({
       next: (res: ISearchUsersResponse) => this.onLoadedMore(res),
       error: (err: HttpErrorResponse) => this.onError()
     });
@@ -98,6 +82,17 @@ export class SearchComponent implements OnInit, OnDestroy {
     return !this.error 
             && this.pageable.totalItemsCount !== 0 
             && !this.pageable.isLastPage;
+  }
+
+  private search(): Observable<ISearchUsersResponse> {
+    return this.githubService.searchUsers({ 
+      login: this.searchText, 
+      page: this.pageable.currentPage,
+      perPage: this.pageable.maxPerPage 
+    }).pipe(
+      takeUntil(this.destroyed$),
+      catchError((err: HttpErrorResponse) => this.onError())
+    );
   }
 
   private clearUsers() {
