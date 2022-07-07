@@ -18,6 +18,12 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
 
 
 @NgModule({
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule
+  ],
   declarations: [
     AppComponent,
     ProfileComponent,
@@ -27,12 +33,6 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
     ReposComponent,
     UserItemComponent,
     LoaderComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule, 
-    HttpClientModule
   ],
   providers: [
     GithubService,

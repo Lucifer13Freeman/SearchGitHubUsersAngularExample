@@ -95,8 +95,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
         })
       }
     });
-
-    
   }
 
   private getUserData$(login: string): Observable<[IUser | never[], 
@@ -104,13 +102,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
                                                   never[] | IRepo[], 
                                                   never[] | IUser[]]> {
 
-    const user = this.githubService.getUser(login)
+    const user$: Observable<IUser | never[]> = this.githubService.getUser(login)
       .pipe(catchError((err: HttpErrorResponse) => {
         this.onError(ErrorTypeEnum.USER); 
         return of([]);
     }));
 
-    const followers = this.githubService.getFollowersByUser({ 
+    const followers$: Observable<IUser[] | never[]> = this.githubService.getFollowersByUser({ 
       login, 
       page: 1,
       perPage: this.FOLLOWERS_PER_PAGE 
@@ -119,7 +117,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return of([]);
     }));
 
-    const repos = this.githubService.getReposByUser({ 
+    const repos$: Observable<IRepo[] | never[]> = this.githubService.getReposByUser({ 
       login, 
       page: 1,
       perPage: this.REPOS_PER_PAGE 
@@ -128,7 +126,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return of([]);
     }));
 
-    const following = this.githubService.getFollowingByUser({ 
+    const following$: Observable<IUser[] | never[]> = this.githubService.getFollowingByUser({ 
       login, 
       page: 1,
       perPage: this.FOLLOWING_PER_PAGE 
@@ -137,7 +135,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return of([]);
     }));
 
-    const getUserDataRes$ = forkJoin([ user, followers, repos, following ]);
+    const getUserDataRes$ = forkJoin([ user$, followers$, repos$, following$ ]);
     return getUserDataRes$;
   }
 
