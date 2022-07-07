@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 
 @Component({
@@ -7,12 +7,8 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
   styleUrls: ['./error.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ErrorComponent implements OnInit {
+export class ErrorComponent {
 
   @Input()
   public text: string = '';
-
-  constructor() { }
-
-  public ngOnInit(): void { }
 }

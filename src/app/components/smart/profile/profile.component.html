@@ -1,7 +1,7 @@
-<div *ngIf="model$ | async as model">
-  <app-error *ngIf="errors.user" text="User did not load..."></app-error>
+<app-error *ngIf="error" text="User did not load..."></app-error>
 
-  <div *ngIf="!errors.user" class="github-card profile-card">
+<div *ngIf="!error && (model$ | async)">
+  <div class="github-card profile-card">
     <div class="header user"></div>
     <a class="avatar" [href]="baseUrl + model.user.login" target="_blank">
       <img [src]="model.user.avatar_url + '&s=80'" [alt]="model.user.login" />
@@ -40,61 +40,7 @@
     </div>
   </div>
 
-  <section *ngIf="!errors.user">
-    <div>
-      <h3>Repos</h3>
-      <div class="container">
-        <app-repos [repos]="model.repos"></app-repos>
-        <button
-          *ngIf="showLoadMoreBtn(reposLoading)"
-          (click)="loadMore(reposLoading)"
-        >
-          Load More
-        </button>
-        <app-error
-          *ngIf="errors.repos"
-          text="Repos did not load..."
-        ></app-error>
-      </div>
-    </div>
-    <div>
-      <h3>Following</h3>
-      <div class="container wrap">
-        <app-user-item
-          *ngFor="let user of model.following"
-          [user]="user"
-        ></app-user-item>
-        <button
-          *ngIf="showLoadMoreBtn(followingLoading)"
-          (click)="loadMore(followingLoading)"
-        >
-          Load More
-        </button>
-        <app-error
-          *ngIf="errors.following"
-          text="Following did not load..."
-        ></app-error>
-      </div>
-    </div>
-    <div>
-      <h3>Followers</h3>
-      <div class="container wrap">
-        <app-user-item
-          *ngFor="let user of model.followers"
-          [user]="user"
-        ></app-user-item>
-        <button
-          *ngIf="showLoadMoreBtn(followersLoading)"
-          (click)="loadMore(followersLoading)"
-        >
-          Load More
-        </button>
-        <app-error
-          *ngIf="errors.followers"
-          text="Followers did not load..."
-        ></app-error>
-      </div>
-    </div>
-  </section>
+  <app-profile-details [user]="model.user"></app-profile-details>
+
   <app-loader *ngIf="model.loading$ | async"></app-loader>
 </div>

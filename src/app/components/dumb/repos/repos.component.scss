@@ -28,9 +28,14 @@ p {
         color: var(--dark-color);
         text-decoration: none;
         padding-left: 10px;
+    }
 
-        &:hover {
-            color: #666;
+    &:hover {
+        background-color: var(--red-tr-color);
+        color: var(--light-color);
+        a {
+            color: var(--light-color);
+            text-decoration: underline;
         }
     }
 }

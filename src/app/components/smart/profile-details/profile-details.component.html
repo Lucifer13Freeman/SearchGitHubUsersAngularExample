@@ -1,0 +1,60 @@
+<div class="details" *ngIf="user && (model$ | async); else error">
+    <div>
+      <h3>Repos</h3>
+      <div class="container">
+        <app-repos [repos]="model.repos"></app-repos>
+        <button
+          *ngIf="showLoadMoreBtn(reposLoading)"
+          (click)="loadMore(reposLoading)"
+        >
+          Load More
+        </button>
+        <app-error
+          *ngIf="errors.repos"
+          text="Repos did not load..."
+        ></app-error>
+      </div>
+    </div>
+    <div>
+      <h3>Following</h3>
+      <div class="container wrap">
+        <app-user-item
+          *ngFor="let user of model.following"
+          [user]="user"
+        ></app-user-item>
+        <button
+          *ngIf="showLoadMoreBtn(followingLoading)"
+          (click)="loadMore(followingLoading)"
+        >
+          Load More
+        </button>
+        <app-error
+          *ngIf="errors.following"
+          text="Following did not load..."
+        ></app-error>
+      </div>
+    </div>
+    <div>
+      <h3>Followers</h3>
+      <div class="container wrap">
+        <app-user-item
+          *ngFor="let user of model.followers"
+          [user]="user"
+        ></app-user-item>
+        <button
+          *ngIf="showLoadMoreBtn(followersLoading)"
+          (click)="loadMore(followersLoading)"
+        >
+          Load More
+        </button>
+        <app-error
+          *ngIf="errors.followers"
+          text="Followers did not load..."
+        ></app-error>
+      </div>
+    </div>
+    <app-loader *ngIf="model.loading$ | async"></app-loader>
+</div>
+<ng-template #error>
+    <app-error [text]="'User details did not load...'"></app-error>
+</ng-template>

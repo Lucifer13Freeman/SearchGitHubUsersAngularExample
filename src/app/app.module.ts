@@ -15,6 +15,7 @@ import { UserItemComponent } from './components/dumb/user-item/user-item.compone
 import { LoaderComponent } from './components/dumb/loader/loader.component';
 import { LoadingService } from './services/loading.service';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
+import { ProfileDetailsComponent } from './components/smart/profile-details/profile-details.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
     NotFoundComponent,
     ReposComponent,
     UserItemComponent,
-    LoaderComponent
+    LoaderComponent,
+    ProfileDetailsComponent
   ],
   providers: [
     GithubService,

@@ -8,7 +8,7 @@ import { ISearchUsersResponse } from 'src/app/interfaces/search-users-response.i
 import { Pageable } from 'src/app/models/pageable.model';
 import { GithubService } from 'src/app/services/github.service';
 import { LoadingService } from 'src/app/services/loading.service';
-import { ISearchModel } from './search-model.interface';
+import { ISearchModel } from './interfaces/search-model.interface';
 
 
 @Component({
@@ -91,7 +91,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   private search(): Observable<ISearchUsersResponse> {
-    return this.githubService.searchUsers({ 
+    return this.githubService.searchUsersByLogin({ 
       login: this.model.searchText, 
       page: this.model.pageable.currentPage,
       perPage: this.model.pageable.maxPerPage 

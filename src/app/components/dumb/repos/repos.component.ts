@@ -8,12 +8,8 @@ import { IRepo } from 'src/app/interfaces/repo.interface';
   styleUrls: ['./repos.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReposComponent implements OnInit {
+export class ReposComponent {
 
   @Input()
   public repos!: IRepo[];
-
-  constructor() { }
-
-  public ngOnInit(): void { }
 }

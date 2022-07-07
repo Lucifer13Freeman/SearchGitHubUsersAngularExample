@@ -1,21 +1,16 @@
 import { Observable } from "rxjs";
-import { LoadMoreEnum } from "src/app/enums/load-more.enum";
 import { IRepo } from "src/app/interfaces/repo.interface";
-import { IUser } from "src/app/interfaces/user.interface";
+import { IUserShort } from "src/app/interfaces/user-short";
 import { Pageable } from "src/app/models/pageable.model";
-import { IProfileErrors } from "../profile-errors.interface";
 
-
-export interface IProfileModel {
-    followers: IUser[];
+export interface IProfileDetailsModel {
+    followers: IUserShort[];
     repos: IRepo[];
-    following: IUser[];
+    following: IUserShort[];
 
     followersPageable: Pageable;
     reposPageable: Pageable;
     followingPageable: Pageable;
-
-    errors: IProfileErrors;
 
     loading$: Observable<boolean>;
 }

@@ -136,43 +136,43 @@ section {
 
     .container {
         max-height: 400px;
-        max-width: 1fr;
         overflow-y: auto;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
+        padding: 10px;
     
-    .wrap {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    button {
-        background: var(--red-color);
-        color: var(--white-color);
-        font-size: 1.5rem;
-        border-radius: 10px;
-        padding: 0.5rem 1.5rem;
-        display: block;
-        width: 100%;
-        border: none;
-        cursor: pointer;
-        transition: opacity 0.2s;
-        outline: none;
-        position: relative;
-        bottom: 0;
-        max-width: 16rem;
-        max-height: 3rem;
-
-        &:disabled {
-            background: var(--dark-color);
+        .wrap {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        button {
+            background: var(--red-color);
             color: var(--white-color);
-            cursor: not-allowed;
+            font-size: 1.5rem;
+            border-radius: 10px;
+            padding: 0.5rem 1.5rem;
+            display: block;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            outline: none;
+            position: relative;
+            bottom: 0;
+            max-width: 16rem;
+            max-height: 3rem;
+
+            &:disabled {
+                background: var(--dark-color);
+                color: var(--white-color);
+                cursor: not-allowed;
+            }
+            &:hover:not(:disabled) {
+                opacity: .8;
+            }
         }
-        &:hover:not(:disabled) {
-            opacity: .8;
-        }
-    }
     }
 
     @media screen and (max-width: 800px) {
