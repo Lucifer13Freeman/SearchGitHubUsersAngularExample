@@ -16,7 +16,6 @@ export interface IUser {
     events_url?: string;
     received_events_url?: string;
     type?: string;
-    score?: number,
     site_admin?: boolean;
     name: string;
     company?: string;
@@ -24,9 +23,9 @@ export interface IUser {
     location?: string;
     email?: string;
     hireable?: string;
-    bio?: string;
+    bio: string;
     public_repos: number;
-    public_gists?: number;
+    public_gists: number;
     followers: number;
     following: number;
     created_at?: string;
