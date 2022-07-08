@@ -1,18 +1,19 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { LoadingInterceptor } from 'src/app/interceptors/loading.interceptor';
 import { GithubService } from 'src/app/services/github.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { SearchComponent } from './search.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ErrorComponent } from '../../dumb/error/error.component';
+import { testLogin } from 'src/app/test/mock-data/github-service.mock';
+import { UserItemComponent } from '../../dumb/user-item/user-item.component';
+import { By } from '@angular/platform-browser';
 
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
-
-  const testText = 'Lucifer13Freeman';
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -21,7 +22,8 @@ describe('SearchComponent', () => {
       ],
       declarations: [ 
         SearchComponent,
-        ErrorComponent
+        ErrorComponent,
+        UserItemComponent
       ],
       providers: [
         GithubService,
@@ -45,7 +47,7 @@ describe('SearchComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  
+
   afterEach(() => {
   });
 });
