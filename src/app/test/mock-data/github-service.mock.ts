@@ -8,10 +8,6 @@ import { environment } from "src/environments/environment";
 export const searchTestUrl = `${environment.API_BASE_URL}search/users?q=`;
 export const getUserTestUrl = `${environment.API_BASE_URL}users/`;
 
-export const testLogin: string = "Lucifer13Freeman";
-export const testLogin2: string = "FARCER";
-export const findNoOneUserText: string = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-
 export const searchOneUserMock: ISearchUsersResponse = {
     incomplete_results: false,
     items: [{

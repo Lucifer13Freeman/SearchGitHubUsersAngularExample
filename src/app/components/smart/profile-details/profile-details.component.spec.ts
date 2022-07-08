@@ -1,14 +1,9 @@
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LoadingInterceptor } from 'src/app/interceptors/loading.interceptor';
-import { GithubService } from 'src/app/services/github.service';
-import { LoadingService } from 'src/app/services/loading.service';
 import { userMock } from 'src/app/test/mock-data/github-service.mock';
-import { ErrorComponent } from '../../dumb/error/error.component';
-
 import { ProfileDetailsComponent } from './profile-details.component';
+
 
 describe('ProfileDetailsComponent', () => {
   let component: ProfileDetailsComponent;

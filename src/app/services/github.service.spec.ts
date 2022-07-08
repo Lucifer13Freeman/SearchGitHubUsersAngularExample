@@ -6,9 +6,10 @@ import { IRepo } from '../interfaces/repo.interface';
 import { ISearchUsersResponse } from '../interfaces/search-users-response.interface';
 import { IUserShort } from '../interfaces/user-short';
 import { IUser } from '../interfaces/user.interface';
-import { searchOneUserMock, testLogin, findNoOneUserText, 
-      searchNoOneUserMock, userMock, searchTestUrl, getUserTestUrl, 
-      userReposMock, userFollowersMock, testLogin2, userFollowingMock } from '../test/mock-data/github-service.mock';
+import { findNoOneUserText, testLogin, testLogin2 } from '../test/mock-data/common.mock';
+import { searchOneUserMock, searchNoOneUserMock, userMock, 
+        searchTestUrl, getUserTestUrl, userReposMock, 
+        userFollowersMock, userFollowingMock } from '../test/mock-data/github-service.mock';
 import { GithubService } from './github.service';
 
 
