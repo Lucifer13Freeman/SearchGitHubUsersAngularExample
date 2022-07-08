@@ -1,14 +1,6 @@
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { LoadingInterceptor } from 'src/app/interceptors/loading.interceptor';
-import { GithubService } from 'src/app/services/github.service';
-import { LoadingService } from 'src/app/services/loading.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SearchComponent } from './search.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ErrorComponent } from '../../dumb/error/error.component';
-import { testLogin } from 'src/app/test/mock-data/github-service.mock';
-import { UserItemComponent } from '../../dumb/user-item/user-item.component';
-import { By } from '@angular/platform-browser';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 
