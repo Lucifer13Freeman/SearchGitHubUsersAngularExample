@@ -1,5 +1,6 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoadingInterceptor } from 'src/app/interceptors/loading.interceptor';
 import { GithubService } from 'src/app/services/github.service';
@@ -19,18 +20,10 @@ describe('ProfileDetailsComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [ 
-        ProfileDetailsComponent,
-        ErrorComponent 
+        ProfileDetailsComponent
       ],
-      providers: [
-        GithubService,
-        LoadingService,
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: LoadingInterceptor,
-          multi: true,
-        },
-      ]
+      providers: [],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
   });

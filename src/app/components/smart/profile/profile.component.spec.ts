@@ -9,6 +9,7 @@ import { testLogin } from 'src/app/test/mock-data/github-service.mock';
 import { ProfileComponent } from './profile.component';
 import { from } from "rxjs";
 import { ErrorComponent } from '../../dumb/error/error.component';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 
 describe('ProfileComponent', () => {
@@ -22,24 +23,17 @@ describe('ProfileComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [ 
-        ProfileComponent,
-        ErrorComponent
+        ProfileComponent
      ],
       providers: [
-        GithubService,
-        LoadingService,
         {
-            provide: HTTP_INTERCEPTORS,
-            useClass: LoadingInterceptor,
-            multi: true,
+          provide: ActivatedRoute,
+          useValue: {
+            params: from([{ login: testLogin }]),
+          },
         },
-        {
-            provide: ActivatedRoute,
-            useValue: {
-              params: from([{ login: testLogin }]),
-            },
-        },
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
   });

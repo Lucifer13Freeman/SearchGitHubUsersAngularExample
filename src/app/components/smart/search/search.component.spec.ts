@@ -9,6 +9,7 @@ import { ErrorComponent } from '../../dumb/error/error.component';
 import { testLogin } from 'src/app/test/mock-data/github-service.mock';
 import { UserItemComponent } from '../../dumb/user-item/user-item.component';
 import { By } from '@angular/platform-browser';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 
 describe('SearchComponent', () => {
@@ -21,19 +22,10 @@ describe('SearchComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [ 
-        SearchComponent,
-        ErrorComponent,
-        UserItemComponent
+        SearchComponent
       ],
-      providers: [
-        GithubService,
-        LoadingService,
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: LoadingInterceptor,
-          multi: true,
-        },
-      ],
+      providers: [],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
   });
